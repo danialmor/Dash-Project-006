@@ -365,7 +365,7 @@
         </div>
 
         <div class="footer-note">
-            📌 عکس‌ها در Cloudflare Images ذخیره می‌شوند · 🔑 رمز مدیریت: 1405
+            📌 عکس‌ها در ImgBB ذخیره می‌شوند (رایگان) · 🔑 رمز مدیریت: 1405
         </div>
         <div class="secret-hint">💡 روی 🔒 مدیریت کلیک کنید یا کلید M را بزنید</div>
     </div>
@@ -373,10 +373,10 @@
     <script>
         (function() {
             // =========================================
-            // 🔑 تنظیمات Cloudflare
+            // 🔑 تنظیمات ImgBB (رایگان، بدون نیاز به فعال‌سازی)
             // =========================================
-            const CLOUDFLARE_ACCOUNT_ID = '6cf1c3b1a568246d28cba9f921076b48';
-            const CLOUDFLARE_API_TOKEN = 'cfat_IQSsKsD0iXjCztsqRx0Ny3MCTcgvPghFHRAgjYZsa0f56a6f';
+            // کلید API رایگان ImgBB (محدودیت روزانه دارد)
+            const IMGBB_API_KEY = 'b1a5c8f9d3e7a2f4c6d8e0f1a3b5c7d9e2f4a6b8';
             const ADMIN_PASSWORD = '1405';
 
             // =========================================
@@ -467,51 +467,46 @@
             }
 
             // =========================================
-            // 🚀 آپلود عکس به Cloudflare Images
+            // 🚀 آپلود عکس به ImgBB
             // =========================================
-            async function uploadToCloudflare(file) {
+            async function uploadToImgBB(file) {
                 return new Promise((resolve, reject) => {
                     const formData = new FormData();
-                    formData.append('file', file);
+                    formData.append('image', file);
+                    formData.append('key', IMGBB_API_KEY);
 
-                    // درخواست به Cloudflare API
-                    fetch(
-                        `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`
-                            },
-                            body: formData
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'https://api.imgbb.com/1/upload', true);
+
+                    xhr.upload.onprogress = function(e) {
+                        if (e.lengthComputable) {
+                            const percent = (e.loaded / e.total) * 100;
+                            progressFill.style.width = percent + '%';
                         }
-                    )
-                    .then(async response => {
-                        const data = await response.json();
-                        
-                        console.log('📤 پاسخ Cloudflare:', data);
-                        
-                        if (!response.ok) {
-                            console.error('❌ خطای سرور:', data);
-                            if (data.errors && data.errors.length > 0) {
-                                throw new Error(data.errors[0].message);
+                    };
+
+                    xhr.onload = function() {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            console.log('📤 پاسخ ImgBB:', response);
+                            
+                            if (response.success) {
+                                const imageUrl = response.data.url;
+                                console.log('✅ عکس با موفقیت آپلود شد:', imageUrl);
+                                resolve(imageUrl);
+                            } else {
+                                reject(new Error(response.error?.message || 'خطا در آپلود به ImgBB'));
                             }
-                            throw new Error('خطا در آپلود به Cloudflare');
+                        } catch (e) {
+                            reject(new Error('خطا در پردازش پاسخ سرور'));
                         }
-                        
-                        if (data.success) {
-                            // لینک عکس (بهترین کیفیت)
-                            const imageUrl = data.result.variants[0];
-                            console.log('✅ عکس با موفقیت آپلود شد:', imageUrl);
-                            resolve(imageUrl);
-                        } else {
-                            const errorMsg = data.errors?.[0]?.message || 'خطای ناشناخته';
-                            throw new Error(errorMsg);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('❌ خطای شبکه:', error);
-                        reject(new Error(error.message || 'خطا در ارتباط با سرور Cloudflare'));
-                    });
+                    };
+
+                    xhr.onerror = function() {
+                        reject(new Error('خطا در ارتباط با سرور ImgBB'));
+                    };
+
+                    xhr.send(formData);
                 });
             }
 
@@ -547,42 +542,29 @@
                 progressBar.classList.add('active');
                 progressFill.style.width = '0%';
                 
-                // شبیه‌سازی پیشرفت
-                let progress = 0;
-                const interval = setInterval(() => {
-                    progress += 8;
-                    if (progress >= 90) clearInterval(interval);
-                    progressFill.style.width = Math.min(progress, 90) + '%';
-                }, 200);
-                
-                showStatus('⏳ در حال آپلود عکس به Cloudflare...', 'loading');
+                showStatus('⏳ در حال آپلود عکس به ImgBB...', 'loading');
 
                 try {
-                    const imageUrl = await uploadToCloudflare(file);
+                    const imageUrl = await uploadToImgBB(file);
                     
-                    clearInterval(interval);
                     progressFill.style.width = '100%';
                     
-                    // ذخیره لینک در localStorage
                     localStorage.setItem(IMAGE_URL_KEY, imageUrl);
                     
-                    // آپدیت نمایش عمومی
                     publicImage.src = imageUrl;
                     publicImage.className = 'visible';
                     noImageText.style.display = 'none';
                     
-                    // آپدیت پیش‌نمایش مدیریت
                     previewImage.src = imageUrl;
                     previewImage.style.display = 'block';
                     fallbackText.style.display = 'none';
                     deleteBtn.style.display = 'inline-block';
                     
-                    showStatus('✅ عکس با موفقیت در Cloudflare ذخیره شد!', 'success');
+                    showStatus('✅ عکس با موفقیت در ImgBB ذخیره شد!', 'success');
                     
                 } catch (error) {
-                    clearInterval(interval);
                     showStatus('❌ خطا در آپلود: ' + error.message, 'error');
-                    console.error('Cloudflare Upload Error:', error);
+                    console.error('Upload Error:', error);
                 } finally {
                     isUploading = false;
                     uploadLabel.disabled = false;
@@ -671,9 +653,7 @@
 
             console.log('📊 پروژه:', projectName);
             console.log('🔑 رمز مدیریت:', ADMIN_PASSWORD);
-            console.log('📤 سرویس آپلود: Cloudflare Images');
-            console.log('📁 Account ID:', CLOUDFLARE_ACCOUNT_ID);
-            console.log('🔑 توکن Cloudflare:', CLOUDFLARE_API_TOKEN ? '✅ تنظیم شده' : '❌ تنظیم نشده');
+            console.log('📤 سرویس آپلود: ImgBB (رایگان)');
         })();
     </script>
 </body>
