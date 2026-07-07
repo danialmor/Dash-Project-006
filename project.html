@@ -359,13 +359,13 @@
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
                 <button class="delete-btn" id="deleteBtn">🗑️ حذف عکس</button>
-                <p style="font-size: 0.8rem; color: #1d4b5e; margin-top: 4px; opacity: 0.7;">PNG, JPG, SVG · حداکثر ۱ مگابایت</p>
+                <p style="font-size: 0.8rem; color: #1d4b5e; margin-top: 4px; opacity: 0.7;">PNG, JPG, SVG · حداکثر ۵ مگابایت</p>
                 <div class="status-msg" id="statusMsg"></div>
             </div>
         </div>
 
         <div class="footer-note">
-            📌 عکس‌ها در خود ریپازیتوری گیت‌هاب ذخیره می‌شوند · 🔑 رمز مدیریت: 1405
+            📌 عکس‌ها در Cloudflare Images ذخیره می‌شوند · 🔑 رمز مدیریت: 1405
         </div>
         <div class="secret-hint">💡 روی 🔒 مدیریت کلیک کنید یا کلید M را بزنید</div>
     </div>
@@ -373,11 +373,10 @@
     <script>
         (function() {
             // =========================================
-            // 🔑 تنظیمات گیت‌هاب
+            // 🔑 تنظیمات Cloudflare (همون اطلاعات خودت)
             // =========================================
-            const GITHUB_TOKEN = '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';
-            const GITHUB_USERNAME = 'danialmor';
-            const GITHUB_REPO = 'upload-image';
+            const CLOUDFLARE_ACCOUNT_ID = '6cf1c3b1a568246d28cba9f921076b48';
+            const CLOUDFLARE_API_TOKEN = 'cfat_IQSsKsD0iXjCztsqRx0Ny3MCTcgvPghFHRAgjYZsa0f56a6f';
             const ADMIN_PASSWORD = '1405';
 
             // =========================================
@@ -464,68 +463,50 @@
                 }
                 setTimeout(() => {
                     statusMsg.classList.remove('show');
-                }, 5000);
+                }, 6000);
             }
 
             // =========================================
-            // 🚀 آپلود عکس به گیت‌هاب
+            // 🚀 آپلود عکس به Cloudflare Images
             // =========================================
-            async function uploadToGitHub(file) {
+            async function uploadToCloudflare(file) {
                 return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
+                    const formData = new FormData();
+                    formData.append('file', file);
                     
-                    reader.onload = async function(e) {
-                        try {
-                            // گرفتن Base64 (بدون header)
-                            const base64 = e.target.result.split(',')[1];
-                            
-                            // ساخت اسم فایل: پروژه_زمان.extension
-                            const extension = file.name.split('.').pop();
-                            const filename = `${projectName}_${Date.now()}.${extension}`;
-                            const path = `images/${filename}`;
-                            
-                            console.log('📤 در حال آپلود به:', `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${path}`);
-                            
-                            // درخواست به GitHub API
-                            const response = await fetch(
-                                `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${path}`,
-                                {
-                                    method: 'PUT',
-                                    headers: {
-                                        'Authorization': `token ${GITHUB_TOKEN}`,
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        message: `آپلود عکس برای پروژه ${projectName}`,
-                                        content: base64,
-                                        branch: 'main'
-                                    })
-                                }
-                            );
-                            
-                            const responseData = await response.json();
-                            
-                            if (!response.ok) {
-                                console.error('❌ خطای سرور:', responseData);
-                                throw new Error(responseData.message || 'خطا در آپلود به گیت‌هاب');
-                            }
-                            
-                            // لینک نهایی عکس (از طریق raw)
-                            const imageUrl = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${GITHUB_REPO}/main/${path}`;
+                    // گزینه‌های اضافی برای Cloudflare Images
+                    formData.append('metadata', JSON.stringify({
+                        project: projectName,
+                        uploadedAt: new Date().toISOString()
+                    }));
+
+                    // درخواست به Cloudflare API
+                    fetch(
+                        `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`
+                            },
+                            body: formData
+                        }
+                    )
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // لینک عکس (بهترین کیفیت)
+                            const imageUrl = data.result.variants[0];
                             console.log('✅ عکس با موفقیت آپلود شد:', imageUrl);
                             resolve(imageUrl);
-                            
-                        } catch (error) {
-                            console.error('❌ خطا:', error);
-                            reject(error);
+                        } else {
+                            console.error('❌ خطای Cloudflare:', data.errors);
+                            reject(new Error(data.errors[0]?.message || 'خطا در آپلود به Cloudflare'));
                         }
-                    };
-                    
-                    reader.onerror = function() {
-                        reject(new Error('خطا در خواندن فایل'));
-                    };
-                    
-                    reader.readAsDataURL(file);
+                    })
+                    .catch(error => {
+                        console.error('❌ خطای شبکه:', error);
+                        reject(new Error('خطا در ارتباط با سرور Cloudflare'));
+                    });
                 });
             }
 
@@ -549,8 +530,8 @@
                     return;
                 }
 
-                if (file.size > 1 * 1024 * 1024) {
-                    showStatus('❌ حجم فایل نباید بیشتر از ۱ مگابایت باشد.', 'error');
+                if (file.size > 5 * 1024 * 1024) {
+                    showStatus('❌ حجم فایل نباید بیشتر از ۵ مگابایت باشد.', 'error');
                     fileInput.value = '';
                     return;
                 }
@@ -564,15 +545,15 @@
                 // شبیه‌سازی پیشرفت
                 let progress = 0;
                 const interval = setInterval(() => {
-                    progress += 10;
+                    progress += 8;
                     if (progress >= 90) clearInterval(interval);
                     progressFill.style.width = Math.min(progress, 90) + '%';
                 }, 200);
                 
-                showStatus('⏳ در حال آپلود عکس به گیت‌هاب...', 'loading');
+                showStatus('⏳ در حال آپلود عکس به Cloudflare...', 'loading');
 
                 try {
-                    const imageUrl = await uploadToGitHub(file);
+                    const imageUrl = await uploadToCloudflare(file);
                     
                     clearInterval(interval);
                     progressFill.style.width = '100%';
@@ -591,12 +572,12 @@
                     fallbackText.style.display = 'none';
                     deleteBtn.style.display = 'inline-block';
                     
-                    showStatus('✅ عکس با موفقیت در گیت‌هاب ذخیره شد!', 'success');
+                    showStatus('✅ عکس با موفقیت در Cloudflare ذخیره شد!', 'success');
                     
                 } catch (error) {
                     clearInterval(interval);
                     showStatus('❌ خطا در آپلود: ' + error.message, 'error');
-                    console.error('GitHub Upload Error:', error);
+                    console.error('Cloudflare Upload Error:', error);
                 } finally {
                     isUploading = false;
                     uploadLabel.disabled = false;
@@ -685,9 +666,9 @@
 
             console.log('📊 پروژه:', projectName);
             console.log('🔑 رمز مدیریت:', ADMIN_PASSWORD);
-            console.log('📤 سرویس آپلود: GitHub API');
-            console.log(`📁 مخزن: ${GITHUB_USERNAME}/${GITHUB_REPO}`);
-            console.log('🔑 توکن:', GITHUB_TOKEN ? '✅ تنظیم شده' : '❌ تنظیم نشده');
+            console.log('📤 سرویس آپلود: Cloudflare Images');
+            console.log('📁 Account ID:', CLOUDFLARE_ACCOUNT_ID);
+            console.log('🔑 توکن Cloudflare:', CLOUDFLARE_API_TOKEN ? '✅ تنظیم شده' : '❌ تنظیم نشده');
         })();
     </script>
 </body>
