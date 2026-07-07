@@ -137,6 +137,21 @@
             text-align: center;
         }
 
+        .token-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 2px solid #e0e7ed;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .token-input:focus {
+            outline: none;
+            border-color: #1a6e3a;
+            background: #f9fffe;
+        }
+
         .upload-label {
             display: inline-block;
             background: #1e3b4f;
@@ -316,6 +331,32 @@
             opacity: 0.5;
         }
 
+        .public-link {
+            margin-top: 12px;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 8px;
+            color: #1a6e3a;
+            font-size: 0.85rem;
+            word-break: break-all;
+            display: none;
+        }
+
+        .copy-link-btn {
+            background: #1a6e3a;
+            color: white;
+            padding: 6px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        .copy-link-btn:hover {
+            background: #0f522a;
+        }
+
         @media (max-width: 600px) {
             .project-name { font-size: 1.6rem; }
             .card { padding: 20px 14px; }
@@ -349,7 +390,12 @@
 
         <div class="admin-panel" id="adminPanel">
             <div class="upload-section">
-                <label for="fileInput" class="upload-label" id="uploadLabel">📤 آپلود نمودار پیشرفت</label>
+                <div style="margin-bottom: 12px; padding: 10px; background: #e3ecf3; border-radius: 8px; font-size: 0.85rem; color: #1a4356;">
+                    🔑 <strong>GitHub Token:</strong> <a href="https://github.com/settings/tokens" target="_blank" style="color: #1a6e3a;">ایجاد Token</a> (دسترسی: repo)
+                </div>
+                <input type="password" id="tokenInput" class="token-input" placeholder="ghp_xxxxxxxxxxxx" />
+                
+                <label for="fileInput" class="upload-label" id="uploadLabel">📤 آپلود نمو��ار پیشرفت</label>
                 <input type="file" id="fileInput" accept="image/*" />
                 <div class="image-preview-container" id="imagePreviewContainer">
                     <img id="previewImage" src="" alt="نمودار" />
@@ -361,51 +407,45 @@
                 <button class="delete-btn" id="deleteBtn">🗑️ حذف عکس</button>
                 <p style="font-size: 0.8rem; color: #1d4b5e; margin-top: 4px; opacity: 0.7;">PNG, JPG, SVG · حداکثر ۵ مگابایت</p>
                 <div class="status-msg" id="statusMsg"></div>
+                <div class="public-link" id="publicLink">
+                    <strong>✅ لینک عمومی:</strong>
+                    <div id="linkText" style="margin-top: 8px; padding: 8px; background: white; border-radius: 4px;"></div>
+                    <button class="copy-link-btn" onclick="copyPublicLink()">📋 کپی لینک</button>
+                </div>
             </div>
         </div>
 
         <div class="footer-note">
-            📌 عکس‌ها در ImgBB ذخیره می‌شوند (رایگان) · 🔑 رمز مدیریت: 1405
+            📌 عکس‌ها در GitHub ذخیره می‌شوند (دائمی) · 🔑 رمز مدیریت: 1405
         </div>
         <div class="secret-hint">💡 روی 🔒 مدیریت کلیک کنید یا کلید M را بزنید</div>
     </div>
 
     <script>
         (function() {
-            // =========================================
-            // 🔑 تنظیمات ImgBB (رایگان، بدون نیاز به فعال‌سازی)
-            // =========================================
-            // کلید API رایگان ImgBB (محدودیت روزانه دارد)
-            const IMGBB_API_KEY = 'b1a5c8f9d3e7a2f4c6d8e0f1a3b5c7d9e2f4a6b8';
             const ADMIN_PASSWORD = '1405';
 
-            // =========================================
             // دریافت نام پروژه
-            // =========================================
             const params = new URLSearchParams(window.location.search);
             const projectName = params.get('name') || 'پروژه';
             document.getElementById('projectName').textContent = projectName;
 
-            // =========================================
             // کلیدهای ذخیره‌سازی
-            // =========================================
             const IMAGE_URL_KEY = 'projectImageUrl_' + projectName;
             const VIEW_KEY = 'projectView_' + projectName;
+            const TOKEN_KEY = 'githubToken_' + projectName;
 
-            // =========================================
             // شمارنده بازدید
-            // =========================================
             let views = parseInt(localStorage.getItem(VIEW_KEY), 10) || 0;
             views += 1;
             localStorage.setItem(VIEW_KEY, views);
             document.getElementById('viewCount').textContent = views;
 
-            // =========================================
             // المان‌ها
-            // =========================================
             const adminToggleBtn = document.getElementById('adminToggleBtn');
             const adminPanel = document.getElementById('adminPanel');
             const fileInput = document.getElementById('fileInput');
+            const tokenInput = document.getElementById('tokenInput');
             const previewImage = document.getElementById('previewImage');
             const fallbackText = document.getElementById('fallbackText');
             const deleteBtn = document.getElementById('deleteBtn');
@@ -414,16 +454,21 @@
             const uploadLabel = document.getElementById('uploadLabel');
             const progressBar = document.getElementById('progressBar');
             const progressFill = document.getElementById('progressFill');
-
             const publicImage = document.getElementById('publicImage');
             const noImageText = document.getElementById('noImageText');
+            const publicLink = document.getElementById('publicLink');
+            const linkText = document.getElementById('linkText');
 
             let isAdminMode = false;
             let isUploading = false;
 
-            // =========================================
+            // بارگذاری توکن ذخیره شده
+            const savedToken = localStorage.getItem(TOKEN_KEY);
+            if (savedToken) {
+                tokenInput.value = savedToken;
+            }
+
             // بارگذاری عکس از لینک ذخیره شده
-            // =========================================
             function loadPublicImage() {
                 const savedUrl = localStorage.getItem(IMAGE_URL_KEY);
                 if (savedUrl && savedUrl.startsWith('http')) {
@@ -435,6 +480,10 @@
                     previewImage.style.display = 'block';
                     fallbackText.style.display = 'none';
                     deleteBtn.style.display = 'inline-block';
+                    
+                    // نمایش لینک عمومی
+                    linkText.innerHTML = `<a href="${savedUrl}" target="_blank">${savedUrl}</a>`;
+                    publicLink.style.display = 'block';
                 } else {
                     publicImage.className = '';
                     publicImage.style.display = 'none';
@@ -443,13 +492,12 @@
                     previewImage.style.display = 'none';
                     fallbackText.style.display = 'block';
                     deleteBtn.style.display = 'none';
+                    publicLink.style.display = 'none';
                 }
             }
             loadPublicImage();
 
-            // =========================================
             // نمایش پیام
-            // =========================================
             function showStatus(msg, type = 'success') {
                 statusMsg.textContent = msg;
                 statusMsg.className = 'status-msg show';
@@ -466,53 +514,63 @@
                 }, 6000);
             }
 
-            // =========================================
-            // 🚀 آپلود عکس به ImgBB
-            // =========================================
-            async function uploadToImgBB(file) {
+            // آپلود به GitHub
+            async function uploadToGitHub(file) {
                 return new Promise((resolve, reject) => {
-                    const formData = new FormData();
-                    formData.append('image', file);
-                    formData.append('key', IMGBB_API_KEY);
+                    const token = tokenInput.value.trim();
+                    if (!token) {
+                        reject(new Error('لطفاً Token GitHub را وارد کنید'));
+                        return;
+                    }
 
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', 'https://api.imgbb.com/1/upload', true);
+                    const fileName = Date.now() + '_' + projectName.replace(/\s+/g, '_') + '_' + file.name;
+                    const reader = new FileReader();
 
-                    xhr.upload.onprogress = function(e) {
-                        if (e.lengthComputable) {
-                            const percent = (e.loaded / e.total) * 100;
-                            progressFill.style.width = percent + '%';
-                        }
-                    };
-
-                    xhr.onload = function() {
+                    reader.onload = async (e) => {
                         try {
-                            const response = JSON.parse(xhr.responseText);
-                            console.log('📤 پاسخ ImgBB:', response);
+                            const base64 = e.target.result.split(',')[1];
                             
-                            if (response.success) {
-                                const imageUrl = response.data.url;
-                                console.log('✅ عکس با موفقیت آپلود شد:', imageUrl);
+                            const response = await fetch(
+                                `https://api.github.com/repos/danialmor/Dash-Project-006/contents/uploads/${fileName}`,
+                                {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Authorization': `token ${token}`,
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        message: `آپلود نمودار: ${projectName}`,
+                                        content: base64
+                                    })
+                                }
+                            );
+
+                            if (response.ok) {
+                                const data = await response.json();
+                                const imageUrl = data.content.download_url;
+                                
+                                // ذخیره Token
+                                localStorage.setItem(TOKEN_KEY, token);
+                                
                                 resolve(imageUrl);
                             } else {
-                                reject(new Error(response.error?.message || 'خطا در آپلود به ImgBB'));
+                                const error = await response.json();
+                                reject(new Error(error.message || 'خطا در آپلود به GitHub'));
                             }
-                        } catch (e) {
-                            reject(new Error('خطا در پردازش پاسخ سرور'));
+                        } catch (error) {
+                            reject(error);
                         }
                     };
 
-                    xhr.onerror = function() {
-                        reject(new Error('خطا در ارتباط با سرور ImgBB'));
+                    reader.onerror = () => {
+                        reject(new Error('خطا در خواندن فایل'));
                     };
 
-                    xhr.send(formData);
+                    reader.readAsDataURL(file);
                 });
             }
 
-            // =========================================
             // مدیریت آپلود فایل
-            // =========================================
             fileInput.addEventListener('change', async function(e) {
                 if (!isAdminMode) {
                     showStatus('⚠️ ابتدا وارد حالت مدیریت شوید.', 'error');
@@ -542,10 +600,11 @@
                 progressBar.classList.add('active');
                 progressFill.style.width = '0%';
                 
-                showStatus('⏳ در حال آپلود عکس به ImgBB...', 'loading');
+                showStatus('⏳ در حال آپلود عکس به GitHub...', 'loading');
 
                 try {
-                    const imageUrl = await uploadToImgBB(file);
+                    progressFill.style.width = '30%';
+                    const imageUrl = await uploadToGitHub(file);
                     
                     progressFill.style.width = '100%';
                     
@@ -560,7 +619,11 @@
                     fallbackText.style.display = 'none';
                     deleteBtn.style.display = 'inline-block';
                     
-                    showStatus('✅ عکس با موفقیت در ImgBB ذخیره شد!', 'success');
+                    // نمایش لینک عمومی
+                    linkText.innerHTML = `<a href="${imageUrl}" target="_blank">${imageUrl}</a>`;
+                    publicLink.style.display = 'block';
+                    
+                    showStatus('✅ عکس با موفقیت در GitHub ذخیره شد!', 'success');
                     
                 } catch (error) {
                     showStatus('❌ خطا در آپلود: ' + error.message, 'error');
@@ -577,9 +640,7 @@
                 }
             });
 
-            // =========================================
             // حذف عکس
-            // =========================================
             deleteBtn.addEventListener('click', function() {
                 if (!isAdminMode) {
                     showStatus('⚠️ ابتدا وارد حالت مدیریت شوید.', 'error');
@@ -597,14 +658,13 @@
                     previewImage.style.display = 'none';
                     fallbackText.style.display = 'block';
                     deleteBtn.style.display = 'none';
+                    publicLink.style.display = 'none';
                     
                     showStatus('🗑️ عکس حذف شد.', 'success');
                 }
             });
 
-            // =========================================
             // مدیریت (رمز ورود)
-            // =========================================
             function toggleAdmin() {
                 if (isUploading) return;
                 
@@ -653,8 +713,18 @@
 
             console.log('📊 پروژه:', projectName);
             console.log('🔑 رمز مدیریت:', ADMIN_PASSWORD);
-            console.log('📤 سرویس آپلود: ImgBB (رایگان)');
+            console.log('📤 سرویس آپلود: GitHub (دائمی)');
         })();
+
+        function copyPublicLink() {
+            const linkElement = document.getElementById('linkText');
+            const link = linkElement.innerText;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('✅ لینک کپی شد!');
+            }).catch(err => {
+                alert('❌ خطا در کپی کردن');
+            });
+        }
     </script>
 </body>
 </html>
