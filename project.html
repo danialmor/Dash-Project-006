@@ -373,7 +373,7 @@
     <script>
         (function() {
             // =========================================
-            // 🔑 تنظیمات Cloudflare (همون اطلاعات خودت)
+            // 🔑 تنظیمات Cloudflare
             // =========================================
             const CLOUDFLARE_ACCOUNT_ID = '6cf1c3b1a568246d28cba9f921076b48';
             const CLOUDFLARE_API_TOKEN = 'cfat_IQSsKsD0iXjCztsqRx0Ny3MCTcgvPghFHRAgjYZsa0f56a6f';
@@ -473,12 +473,6 @@
                 return new Promise((resolve, reject) => {
                     const formData = new FormData();
                     formData.append('file', file);
-                    
-                    // گزینه‌های اضافی برای Cloudflare Images
-                    formData.append('metadata', JSON.stringify({
-                        project: projectName,
-                        uploadedAt: new Date().toISOString()
-                    }));
 
                     // درخواست به Cloudflare API
                     fetch(
@@ -491,21 +485,32 @@
                             body: formData
                         }
                     )
-                    .then(response => response.json())
-                    .then(data => {
+                    .then(async response => {
+                        const data = await response.json();
+                        
+                        console.log('📤 پاسخ Cloudflare:', data);
+                        
+                        if (!response.ok) {
+                            console.error('❌ خطای سرور:', data);
+                            if (data.errors && data.errors.length > 0) {
+                                throw new Error(data.errors[0].message);
+                            }
+                            throw new Error('خطا در آپلود به Cloudflare');
+                        }
+                        
                         if (data.success) {
                             // لینک عکس (بهترین کیفیت)
                             const imageUrl = data.result.variants[0];
                             console.log('✅ عکس با موفقیت آپلود شد:', imageUrl);
                             resolve(imageUrl);
                         } else {
-                            console.error('❌ خطای Cloudflare:', data.errors);
-                            reject(new Error(data.errors[0]?.message || 'خطا در آپلود به Cloudflare'));
+                            const errorMsg = data.errors?.[0]?.message || 'خطای ناشناخته';
+                            throw new Error(errorMsg);
                         }
                     })
                     .catch(error => {
                         console.error('❌ خطای شبکه:', error);
-                        reject(new Error('خطا در ارتباط با سرور Cloudflare'));
+                        reject(new Error(error.message || 'خطا در ارتباط با سرور Cloudflare'));
                     });
                 });
             }
