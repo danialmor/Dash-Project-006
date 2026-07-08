@@ -132,7 +132,7 @@
         }
 
         /* ========================================= */
-        /* 🏆 بخش رقابتی SPI - جدید */
+        /* 🏆 بخش رقابتی SPI */
         /* ========================================= */
         .spi-competitive {
             background: rgba(255, 255, 255, 0.5);
@@ -248,6 +248,162 @@
         .deviation-zero { color: #6b7280; }
 
         /* ========================================= */
+        /* 🛠️ پنل مدیریت (ویرایش داده‌ها) */
+        /* ========================================= */
+        .admin-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+            margin: 16px 0 20px 0;
+            padding: 24px;
+            background: rgba(235, 245, 250, 0.6);
+            border-radius: 32px;
+            border: 2px solid #3f6b7c;
+        }
+
+        .admin-panel.visible {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-panel h3 {
+            color: #0b2a3b;
+            margin-bottom: 6px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .admin-panel .admin-subtitle {
+            text-align: center;
+            color: #1a4356;
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-bottom: 16px;
+        }
+
+        .admin-table-wrap {
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .admin-table thead th {
+            background: #1e3b4f;
+            color: white;
+            padding: 10px 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .admin-table tbody td {
+            padding: 8px 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .admin-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .admin-table .admin-input {
+            width: 70px;
+            padding: 6px 8px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.2s;
+            background: white;
+        }
+
+        .admin-table .admin-input:focus {
+            outline: none;
+            border-color: #1a6e3a;
+            box-shadow: 0 0 0 3px rgba(26, 110, 58, 0.2);
+        }
+
+        .admin-table .admin-input.spi-input { width: 70px; }
+        .admin-table .admin-input.progress-input { width: 60px; }
+        .admin-table .admin-input.deviation-input { width: 70px; }
+
+        .admin-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .admin-actions button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .admin-actions .save-btn {
+            background: #1a6e3a;
+            color: white;
+        }
+
+        .admin-actions .save-btn:hover {
+            background: #0f522a;
+            transform: scale(1.02);
+        }
+
+        .admin-actions .reset-btn {
+            background: #dc2626;
+            color: white;
+        }
+
+        .admin-actions .reset-btn:hover {
+            background: #b91c1c;
+            transform: scale(1.02);
+        }
+
+        .admin-actions .close-btn {
+            background: #6b7280;
+            color: white;
+        }
+
+        .admin-actions .close-btn:hover {
+            background: #4b5563;
+            transform: scale(1.02);
+        }
+
+        .admin-status {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #1a6e3a;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .admin-status.show {
+            opacity: 1;
+        }
+
+        .admin-status.error {
+            color: #dc2626;
+        }
+
+        /* ========================================= */
 
         .update-date-section {
             display: flex;
@@ -303,108 +459,6 @@
         .update-date-section .update-btn:hover {
             background: #0f522a;
             transform: scale(1.02);
-        }
-
-        .admin-panel {
-            display: none;
-            animation: fadeIn 0.3s ease;
-            margin: 16px 0 20px 0;
-            padding: 20px;
-            background: rgba(235, 245, 250, 0.4);
-            border-radius: 32px;
-            border: 2px dashed #3f6b7c;
-        }
-
-        .admin-panel.visible {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .admin-panel h3 {
-            color: #0b2a3b;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .admin-panel .upload-label {
-            display: inline-block;
-            background: #1e3b4f;
-            color: white;
-            padding: 10px 30px;
-            border-radius: 60px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: 500;
-        }
-
-        .admin-panel .upload-label:hover {
-            background: #14303f;
-            transform: scale(1.02);
-        }
-
-        .admin-panel #fileInput {
-            display: none;
-        }
-
-        .admin-panel .image-preview-container {
-            margin: 14px auto 6px;
-            max-width: 100%;
-            border-radius: 28px;
-            overflow: hidden;
-            background: #eef4f9;
-            min-height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #bfd7e3;
-            cursor: pointer;
-        }
-
-        .admin-panel .image-preview-container img {
-            max-width: 100%;
-            max-height: 300px;
-            display: none;
-            border-radius: 24px;
-        }
-
-        .admin-panel .fallback-text {
-            color: #3f5f70;
-            padding: 20px;
-            font-size: 0.9rem;
-            opacity: 0.6;
-        }
-
-        .admin-panel .delete-btn {
-            margin-top: 10px;
-            padding: 6px 20px;
-            background: #c0392b;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: 0.2s;
-            display: none;
-        }
-
-        .admin-panel .delete-btn:hover {
-            background: #a93226;
-        }
-
-        .status-msg {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #1e7e34;
-            opacity: 0;
-            transition: 0.3s;
-            text-align: center;
-        }
-
-        .status-msg.show {
-            opacity: 1;
         }
 
         .links-grid {
@@ -473,6 +527,34 @@
             opacity: 0.5;
         }
 
+        /* Admin Bar */
+        .admin-bar {
+            display: none;
+            margin-bottom: 16px;
+            padding: 12px 20px;
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: 600;
+            color: #92400e;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .admin-bar.show {
+            display: block;
+        }
+
+        .admin-bar .exit-btn {
+            color: #dc2626;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .admin-bar .exit-btn:hover {
+            color: #991b1b;
+        }
+
         @media (max-width: 600px) {
             .main-title { font-size: 1.8rem; }
             .card { padding: 20px 14px; }
@@ -487,6 +569,11 @@
             .description-box { padding: 16px; font-size: 0.95rem; }
             .spi-table thead th, .spi-table tbody td { padding: 6px 4px; font-size: 0.75rem; }
             .progress-bar-cell .bar-bg { width: 40px; }
+            .admin-table thead th, .admin-table tbody td { padding: 6px 4px; font-size: 0.75rem; }
+            .admin-table .admin-input { width: 50px; font-size: 0.75rem; }
+            .admin-table .admin-input.spi-input { width: 55px; }
+            .admin-table .admin-input.progress-input { width: 45px; }
+            .admin-table .admin-input.deviation-input { width: 55px; }
         }
     </style>
 </head>
@@ -537,24 +624,50 @@
             </div>
         </div>
 
+        <!-- ========================================= -->
+        <!-- 🛠️ پنل مدیریت (ویرایش داده‌ها) -->
+        <!-- ========================================= -->
+        <div class="admin-bar" id="adminBar">
+            ✏️ <strong>حالت مدیریت فعال</strong> — می‌توانید داده‌های SPI، پیشرفت و انحراف را ویرایش کنید
+            · <span class="exit-btn" id="adminExit">خروج</span>
+        </div>
+
+        <div class="admin-panel" id="adminPanel">
+            <h3>🛠️ ویرایش داده‌های پروژه‌ها</h3>
+            <p class="admin-subtitle">مقادیر SPI، درصد پیشرفت و انحراف (روز) را تغییر دهید و روی «ذخیره تغییرات» کلیک کنید</p>
+
+            <div class="admin-table-wrap">
+                <table class="admin-table" id="adminTable">
+                    <thead>
+                        <tr>
+                            <th style="text-align:right;">پروژه</th>
+                            <th>SPI</th>
+                            <th>پیشرفت %</th>
+                            <th>انحراف (روز)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        <!-- توسط جاوااسکریپت پر می‌شود -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="admin-actions">
+                <button class="save-btn" id="saveDataBtn">💾 ذخیره تغییرات</button>
+                <button class="reset-btn" id="resetDataBtn">🔄 بازگشت به پیش‌فرض</button>
+                <button class="close-btn" id="closeAdminBtn">🔒 بستن مدیریت</button>
+            </div>
+
+            <div class="admin-status" id="adminStatus"></div>
+        </div>
+
+        <!-- ========================================= -->
+
         <div class="update-date-section">
             <label>📌 آخرین آپدیت نمودارها:</label>
             <input type="text" id="updateDateInput" placeholder="مثلاً 1405/04/16" />
             <button class="update-btn" id="updateDateBtn">ثبت تاریخ</button>
             <span style="font-size:0.8rem; color:#1a4356; opacity:0.6;" id="updateDateDisplay">(هنوز ثبت نشده)</span>
-        </div>
-
-        <!-- پنل مدیریت -->
-        <div class="admin-panel" id="adminPanel">
-            <h3>🖼️ مدیریت تصویر اصلی صفحه</h3>
-            <label for="fileInput" class="upload-label">📤 آپلود عکس</label>
-            <input type="file" id="fileInput" accept="image/*" />
-            <div class="image-preview-container" id="imagePreviewContainer">
-                <img id="previewImage" src="" alt="تصویر" />
-                <div class="fallback-text" id="fallbackText">⬆️ برای آپلود کلیک کنید</div>
-            </div>
-            <button class="delete-btn" id="deleteBtn">🗑️ حذف عکس</button>
-            <div class="status-msg" id="statusMsg"></div>
         </div>
 
         <div class="links-grid" id="projectLinks">
@@ -570,7 +683,7 @@
         </div>
 
         <div class="footer-note">
-            ✨ طراحی شده برای مدیریت پروژه‌های عمرانی · v2.0
+            ✨ طراحی شده برای مدیریت پروژه‌های عمرانی · v3.0
         </div>
         <div class="secret-hint">💡 روی 🔒 مدیریت کلیک کنید · رمز: 1405</div>
     </div>
@@ -580,9 +693,9 @@
             const ADMIN_PASSWORD = '1405';
 
             // =========================================
-            // 📊 داده‌های پروژه‌ها (SPI، پیشرفت، انحراف)
+            // 📊 داده‌های پیش‌فرض پروژه‌ها
             // =========================================
-            const PROJECTS = [
+            const DEFAULT_PROJECTS = [
                 { name: 'حمزه', spi: 1.15, progress: 78, deviation: -5 },
                 { name: 'بلوار مهر', spi: 0.92, progress: 45, deviation: 8 },
                 { name: 'بهار آزادی', spi: 1.05, progress: 62, deviation: -3 },
@@ -595,27 +708,31 @@
             ];
 
             const DATA_KEY = 'dashboard_spi_data';
+            let isAdminMode = false;
 
+            // =========================================
+            // 📥 دریافت داده‌ها
+            // =========================================
             function getProjectData() {
                 const saved = localStorage.getItem(DATA_KEY);
                 if (saved) {
                     try {
                         const parsed = JSON.parse(saved);
                         // اطمینان از کامل بودن داده‌ها
-                        const allNames = PROJECTS.map(p => p.name);
+                        const allNames = DEFAULT_PROJECTS.map(p => p.name);
                         const existingNames = parsed.map(p => p.name);
                         allNames.forEach(name => {
                             if (!existingNames.includes(name)) {
-                                const defaultItem = PROJECTS.find(d => d.name === name);
+                                const defaultItem = DEFAULT_PROJECTS.find(d => d.name === name);
                                 if (defaultItem) parsed.push({ ...defaultItem });
                             }
                         });
                         return parsed;
                     } catch (e) {
-                        return PROJECTS;
+                        return DEFAULT_PROJECTS;
                     }
                 }
-                return PROJECTS;
+                return DEFAULT_PROJECTS;
             }
 
             function saveProjectData(data) {
@@ -627,7 +744,6 @@
             // =========================================
             function renderSpiTable() {
                 const data = getProjectData();
-                // مرتب‌سازی بر اساس SPI (نزولی)
                 const sorted = [...data].sort((a, b) => b.spi - a.spi);
                 const tbody = document.getElementById('spiTableBody');
                 tbody.innerHTML = '';
@@ -639,12 +755,10 @@
                     else if (rank === 2) rankClass = 'rank-2';
                     else if (rank === 3) rankClass = 'rank-3';
 
-                    // کلاس SPI
                     let spiClass = 'spi-good';
                     if (p.spi < 0.8) spiClass = 'spi-danger';
                     else if (p.spi < 1) spiClass = 'spi-warning';
 
-                    // کلاس انحراف
                     let devClass = 'deviation-zero';
                     let devText = 'طبق برنامه';
                     if (p.deviation > 0) {
@@ -655,7 +769,6 @@
                         devText = `${Math.abs(p.deviation)} روز جلوتر`;
                     }
 
-                    // وضعیت
                     let statusText = '✅ عالی';
                     if (p.spi < 0.8) statusText = '🔴 بحرانی';
                     else if (p.spi < 1) statusText = '⚠️ نیازمند توجه';
@@ -678,6 +791,113 @@
                     `;
                     tbody.appendChild(tr);
                 });
+            }
+
+            // =========================================
+            // 🛠️ رندر جدول ویرایش مدیریت
+            // =========================================
+            function renderAdminTable() {
+                const data = getProjectData();
+                const tbody = document.getElementById('adminTableBody');
+                tbody.innerHTML = '';
+
+                data.forEach((p, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="text-align:right;font-weight:600;">${p.name}</td>
+                        <td><input type="number" step="0.01" value="${p.spi}" data-idx="${index}" data-field="spi" class="admin-input spi-input" /></td>
+                        <td><input type="number" step="1" min="0" max="100" value="${p.progress}" data-idx="${index}" data-field="progress" class="admin-input progress-input" /></td>
+                        <td><input type="number" step="1" value="${p.deviation}" data-idx="${index}" data-field="deviation" class="admin-input deviation-input" /></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // =========================================
+            // 📤 ذخیره تغییرات از جدول مدیریت
+            // =========================================
+            function saveAdminChanges() {
+                const inputs = document.querySelectorAll('#adminTableBody .admin-input');
+                const data = getProjectData();
+
+                inputs.forEach(input => {
+                    const idx = parseInt(input.dataset.idx);
+                    const field = input.dataset.field;
+                    const val = parseFloat(input.value);
+                    if (!isNaN(val) && idx < data.length) {
+                        data[idx][field] = val;
+                    }
+                });
+
+                // محدودیت پیشرفت بین 0 تا 100
+                data.forEach(p => {
+                    if (p.progress < 0) p.progress = 0;
+                    if (p.progress > 100) p.progress = 100;
+                });
+
+                saveProjectData(data);
+                renderSpiTable();
+                showAdminStatus('✅ تغییرات با موفقیت ذخیره شد!', 'success');
+            }
+
+            // =========================================
+            // 🔄 بازگشت به داده‌های پیش‌فرض
+            // =========================================
+            function resetToDefault() {
+                if (confirm('آیا مطمئن هستید؟ همه تغییرات شما از بین خواهد رفت.')) {
+                    saveProjectData(DEFAULT_PROJECTS);
+                    renderSpiTable();
+                    renderAdminTable();
+                    showAdminStatus('🔄 داده‌ها به حالت پیش‌فرض بازگشتند.', 'success');
+                }
+            }
+
+            // =========================================
+            // 📊 نمایش وضعیت در پنل مدیریت
+            // =========================================
+            function showAdminStatus(msg, type = 'success') {
+                const status = document.getElementById('adminStatus');
+                status.textContent = msg;
+                status.className = 'admin-status show';
+                if (type === 'error') {
+                    status.classList.add('error');
+                } else {
+                    status.classList.remove('error');
+                }
+                setTimeout(() => {
+                    status.classList.remove('show');
+                }, 4000);
+            }
+
+            // =========================================
+            // 🔓 مدیریت (رمز ورود)
+            // =========================================
+            function toggleAdmin() {
+                if (!isAdminMode) {
+                    const password = prompt('🔑 لطفاً رمز مدیریت را وارد کنید:');
+                    if (password === ADMIN_PASSWORD) {
+                        isAdminMode = true;
+                        document.getElementById('adminBar').classList.add('show');
+                        document.getElementById('adminPanel').classList.add('visible');
+                        document.getElementById('adminToggleBtn').textContent = '🔓 بستن مدیریت';
+                        document.getElementById('adminToggleBtn').classList.add('active');
+                        renderAdminTable();
+                        showAdminStatus('✅ وارد حالت مدیریت شدید.', 'success');
+                    } else if (password !== null) {
+                        showAdminStatus('❌ رمز اشتباه است!', 'error');
+                    }
+                } else {
+                    exitAdmin();
+                }
+            }
+
+            function exitAdmin() {
+                isAdminMode = false;
+                document.getElementById('adminBar').classList.remove('show');
+                document.getElementById('adminPanel').classList.remove('visible');
+                document.getElementById('adminToggleBtn').textContent = '🔒 مدیریت';
+                document.getElementById('adminToggleBtn').classList.remove('active');
+                showAdminStatus('🔒 از حالت مدیریت خارج شدید.', 'success');
             }
 
             // =========================================
@@ -729,9 +949,9 @@
                 if (val) {
                     localStorage.setItem(UPDATE_KEY, val);
                     updateDisplay.textContent = '📅 ' + val;
-                    showStatus('✅ تاریخ آپدیت ثبت شد: ' + val);
+                    showAdminStatus('✅ تاریخ آپدیت ثبت شد: ' + val, 'success');
                 } else {
-                    showStatus('⚠️ لطفاً تاریخی وارد کنید.', false);
+                    showAdminStatus('⚠️ لطفاً تاریخی وارد کنید.', 'error');
                 }
             });
 
@@ -747,118 +967,15 @@
             });
 
             // =========================================
-            // 4. مدیریت تصویر اصلی
+            // 4. رویدادهای دکمه‌ها
             // =========================================
-            const IMAGE_KEY = 'mainPageImage';
-            let isAdminMode = false;
+            document.getElementById('adminToggleBtn').addEventListener('click', toggleAdmin);
+            document.getElementById('adminExit').addEventListener('click', exitAdmin);
+            document.getElementById('closeAdminBtn').addEventListener('click', exitAdmin);
+            document.getElementById('saveDataBtn').addEventListener('click', saveAdminChanges);
+            document.getElementById('resetDataBtn').addEventListener('click', resetToDefault);
 
-            const adminToggleBtn = document.getElementById('adminToggleBtn');
-            const adminPanel = document.getElementById('adminPanel');
-            const fileInput = document.getElementById('fileInput');
-            const previewImage = document.getElementById('previewImage');
-            const fallbackText = document.getElementById('fallbackText');
-            const deleteBtn = document.getElementById('deleteBtn');
-            const imgPreviewContainer = document.getElementById('imagePreviewContainer');
-            const statusMsg = document.getElementById('statusMsg');
-
-            function loadMainImage() {
-                const saved = localStorage.getItem(IMAGE_KEY);
-                if (saved) {
-                    previewImage.src = saved;
-                    previewImage.style.display = 'block';
-                    fallbackText.style.display = 'none';
-                    deleteBtn.style.display = 'inline-block';
-                } else {
-                    previewImage.style.display = 'none';
-                    fallbackText.style.display = 'block';
-                    deleteBtn.style.display = 'none';
-                }
-            }
-            loadMainImage();
-
-            function showStatus(msg, isSuccess = true) {
-                statusMsg.textContent = msg;
-                statusMsg.style.color = isSuccess ? '#1a6e3a' : '#c0392b';
-                statusMsg.className = 'status-msg show';
-                setTimeout(() => {
-                    statusMsg.classList.remove('show');
-                }, 3500);
-            }
-
-            function toggleAdmin() {
-                if (!isAdminMode) {
-                    const password = prompt('🔑 لطفاً رمز مدیریت را وارد کنید:');
-                    if (password === ADMIN_PASSWORD) {
-                        isAdminMode = true;
-                        adminPanel.classList.add('visible');
-                        adminToggleBtn.textContent = '🔓 بستن مدیریت';
-                        adminToggleBtn.classList.add('active');
-                        showStatus('✅ وارد حالت مدیریت شدید.');
-                    } else if (password !== null) {
-                        showStatus('❌ رمز اشتباه است!', false);
-                    }
-                } else {
-                    isAdminMode = false;
-                    adminPanel.classList.remove('visible');
-                    adminToggleBtn.textContent = '🔒 مدیریت';
-                    adminToggleBtn.classList.remove('active');
-                    showStatus('🔒 از حالت مدیریت خارج شدید.');
-                }
-            }
-
-            adminToggleBtn.addEventListener('click', toggleAdmin);
-
-            fileInput.addEventListener('change', function(e) {
-                if (!isAdminMode) {
-                    showStatus('⚠️ ابتدا وارد حالت مدیریت شوید.', false);
-                    return;
-                }
-                const file = e.target.files[0];
-                if (!file) return;
-
-                if (!file.type.startsWith('image/')) {
-                    showStatus('❌ لطفاً فایل تصویری انتخاب کنید.', false);
-                    fileInput.value = '';
-                    return;
-                }
-
-                if (file.size > 3 * 1024 * 1024) {
-                    showStatus('❌ حجم فایل نباید بیشتر از ۳ مگابایت باشد.', false);
-                    fileInput.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    const data = ev.target.result;
-                    localStorage.setItem(IMAGE_KEY, data);
-                    previewImage.src = data;
-                    previewImage.style.display = 'block';
-                    fallbackText.style.display = 'none';
-                    deleteBtn.style.display = 'inline-block';
-                    showStatus('✅ عکس با موفقیت ذخیره شد!');
-                };
-                reader.readAsDataURL(file);
-            });
-
-            deleteBtn.addEventListener('click', function() {
-                if (!isAdminMode) {
-                    showStatus('⚠️ ابتدا وارد حالت مدیریت شوید.', false);
-                    return;
-                }
-                if (confirm('آیا عکس حذف شود؟')) {
-                    localStorage.removeItem(IMAGE_KEY);
-                    loadMainImage();
-                    showStatus('🗑️ عکس حذف شد.');
-                }
-            });
-
-            imgPreviewContainer.addEventListener('click', function() {
-                if (isAdminMode) {
-                    fileInput.click();
-                }
-            });
-
+            // کلید میانبر M
             document.addEventListener('keydown', function(e) {
                 if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.altKey && !e.metaKey) {
                     e.preventDefault();
@@ -867,13 +984,14 @@
             });
 
             // =========================================
-            // 🚀 رندر اولیه جدول SPI
+            // 🚀 بارگذاری اولیه
             // =========================================
             renderSpiTable();
 
             console.log('📊 مدیریت متمرکز پروژه‌ها - نسخه ۳.۰');
             console.log('🔑 رمز مدیریت:', ADMIN_PASSWORD);
             console.log('🏆 جدول رقابتی SPI فعال شد');
+            console.log('🛠️ برای ویرایش داده‌ها، روی دکمه مدیریت کلیک کنید');
         })();
     </script>
 </body>
