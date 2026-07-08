@@ -1,708 +1,248 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>داشبورد مدیریت پروژه‌ها</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Tahoma', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(145deg, #f0f4f8 0%, #d9e2ec 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px;
-        }
-
-        .card {
-            max-width: 1100px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
-            border-radius: 48px;
-            padding: 35px 35px 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            position: relative;
-            margin-top: 10px;
-        }
-
-        .admin-toggle-btn {
-            position: absolute;
-            top: 18px;
-            left: 22px;
-            background: rgba(30, 59, 79, 0.1);
-            border: 2px dashed rgba(30, 59, 79, 0.3);
-            color: #1e3b4f;
-            padding: 8px 18px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: 0.3s;
-            z-index: 10;
-            font-weight: 600;
-        }
-
-        .admin-toggle-btn:hover {
-            background: rgba(30, 59, 79, 0.2);
-            border-color: #1e3b4f;
-        }
-
-        .admin-toggle-btn.active {
-            background: #1e3b4f;
-            color: white;
-            border-color: #1e3b4f;
-        }
-
-        .main-title {
-            font-size: 2.6rem;
-            font-weight: 700;
-            color: #0b2a3b;
-            text-align: center;
-            margin-bottom: 4px;
-            letter-spacing: -1px;
-        }
-
-        .main-title small {
-            font-size: 1rem;
-            font-weight: 400;
-            color: #3f6a7e;
-            display: block;
-            margin-top: 2px;
-        }
-
-        .date-section {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin: 10px 0 18px 0;
-            padding: 10px 16px;
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 60px;
-            backdrop-filter: blur(4px);
-        }
-
-        .date-item {
-            font-size: 0.95rem;
-            color: #1a4356;
-            font-weight: 500;
-        }
-
-        .date-item strong {
-            color: #0b2a3b;
-        }
-
-        .date-item .shamsi {
-            color: #1a6e3a;
-            font-weight: 700;
-        }
-
-        .date-item .miladi {
-            color: #1a4f7a;
-            font-weight: 700;
-        }
-
-        .description-box {
-            background: linear-gradient(135deg, rgba(26, 67, 86, 0.08), rgba(26, 110, 58, 0.05));
-            border-radius: 24px;
-            padding: 22px 28px;
-            margin: 10px 0 24px 0;
-            border-right: 5px solid #1a6e3a;
-            border-left: 1px solid rgba(0,0,0,0.05);
-            line-height: 1.9;
-            color: #1a3a4a;
-            font-size: 1.05rem;
-        }
-
-        .description-box strong {
-            color: #0b2a3b;
-        }
-
-        .description-box .highlight {
-            color: #1a6e3a;
-            font-weight: 600;
-        }
-
-        .update-date-section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin: 6px 0 20px 0;
-            padding: 8px 20px;
-            background: rgba(255, 215, 0, 0.12);
-            border-radius: 60px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .update-date-section label {
-            font-weight: 600;
-            color: #1a4356;
-            font-size: 0.95rem;
-        }
-
-        .update-date-section input[type="text"] {
-            border: none;
-            background: rgba(255, 255, 255, 0.6);
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-size: 0.95rem;
-            color: #0b2a3b;
-            font-weight: 600;
-            width: 200px;
-            text-align: center;
-            border: 1px solid transparent;
-            transition: 0.2s;
-        }
-
-        .update-date-section input[type="text"]:focus {
-            outline: none;
-            border-color: #1a6e3a;
-            background: white;
-        }
-
-        .update-date-section .update-btn {
-            background: #1a6e3a;
-            color: white;
-            border: none;
-            padding: 6px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: 0.2s;
-        }
-
-        .update-date-section .update-btn:hover {
-            background: #0f522a;
-            transform: scale(1.02);
-        }
-
-        .admin-panel {
-            display: none;
-            animation: fadeIn 0.3s ease;
-            margin: 16px 0 20px 0;
-            padding: 20px;
-            background: rgba(235, 245, 250, 0.4);
-            border-radius: 32px;
-            border: 2px dashed #3f6b7c;
-        }
-
-        .admin-panel.visible {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .admin-panel h3 {
-            color: #0b2a3b;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .admin-panel .upload-label {
-            display: inline-block;
-            background: #1e3b4f;
-            color: white;
-            padding: 10px 30px;
-            border-radius: 60px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: 500;
-        }
-
-        .admin-panel .upload-label:hover {
-            background: #14303f;
-            transform: scale(1.02);
-        }
-
-        .admin-panel #fileInput {
-            display: none;
-        }
-
-        .admin-panel .image-preview-container {
-            margin: 14px auto 6px;
-            max-width: 100%;
-            border-radius: 28px;
-            overflow: hidden;
-            background: #eef4f9;
-            min-height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #bfd7e3;
-            cursor: pointer;
-        }
-
-        .admin-panel .image-preview-container img {
-            max-width: 100%;
-            max-height: 300px;
-            display: none;
-            border-radius: 24px;
-        }
-
-        .admin-panel .fallback-text {
-            color: #3f5f70;
-            padding: 20px;
-            font-size: 0.9rem;
-            opacity: 0.6;
-        }
-
-        .admin-panel .delete-btn {
-            margin-top: 10px;
-            padding: 6px 20px;
-            background: #c0392b;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: 0.2s;
-            display: none;
-        }
-
-        .admin-panel .delete-btn:hover {
-            background: #a93226;
-        }
-
-        .status-msg {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #1e7e34;
-            opacity: 0;
-            transition: 0.3s;
-            text-align: center;
-        }
-
-        .status-msg.show {
-            opacity: 1;
-        }
-
-        /* نمایش عکس پروژه‌ها در صفحه اصلی */
-        .project-preview {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-            margin: 16px 0 20px 0;
-        }
-
-        .project-preview-item {
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 16px;
-            padding: 12px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .project-preview-item .pname {
-            font-weight: 700;
-            color: #0b2a3b;
-            margin-bottom: 6px;
-            font-size: 0.95rem;
-        }
-
-        .project-preview-item img {
-            max-width: 100%;
-            max-height: 120px;
-            border-radius: 12px;
-            border: 2px solid rgba(26, 110, 58, 0.2);
-            display: none;
-            object-fit: cover;
-        }
-
-        .project-preview-item .no-image {
-            color: #8a9ba8;
-            font-size: 0.8rem;
-            padding: 8px;
-        }
-
-        .project-preview-item img.visible {
-            display: block;
-        }
-
-        .links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 14px;
-            margin-top: 12px;
-        }
-
-        .project-link {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(4px);
-            padding: 14px 8px;
-            border-radius: 60px;
-            text-align: center;
-            font-weight: 600;
-            color: #0b2a3b;
-            text-decoration: none;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            transition: all 0.2s ease;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
-            display: block;
-        }
-
-        .project-link:hover {
-            background: white;
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(0, 20, 30, 0.15);
-            border-color: #5f8aa0;
-            color: #003153;
-        }
-
-        .project-link::before {
-            content: "📌 ";
-            font-size: 1rem;
-        }
-
-        .project-link.has-image::after {
-            content: " ✅";
-            font-size: 0.85rem;
-            color: #1a6e3a;
-        }
-
-        .footer-note {
-            margin-top: 28px;
-            text-align: center;
-            color: #1e4b5e;
-            opacity: 0.5;
-            font-size: 0.8rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            padding-top: 16px;
-        }
-
-        .secret-hint {
-            text-align: center;
-            margin-top: 4px;
-            font-size: 0.7rem;
-            color: #1e4b5e;
-            opacity: 0.15;
-            transition: 0.3s;
-            cursor: default;
-        }
-
-        .secret-hint:hover {
-            opacity: 0.5;
-        }
-
-        @media (max-width: 600px) {
-            .main-title { font-size: 1.8rem; }
-            .card { padding: 20px 14px; }
-            .admin-toggle-btn { 
-                top: 12px;
-                left: 12px;
-                padding: 6px 12px;
-                font-size: 0.7rem;
-            }
-            .date-section { flex-direction: column; align-items: center; gap: 6px; }
-            .update-date-section { flex-direction: column; }
-            .description-box { padding: 16px; font-size: 0.95rem; }
-            .project-preview { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-        }
+ <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260708-05-579f504"}');</script><script src="/_sdk/f432b76fb310b513.telemetry_sdk.js" integrity="sha512-9FJQ55EKmmqhyyik8BhrMVfm0+iYYfb8uOlRsjtkxJMEI97qOVEI4PnHohDjQAtvAep0IOEpdQ64eki0sz62ug=="></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد مدیریت پروژه‌ها</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <style>
+        body { font-family: 'DM Sans', 'Tahoma', sans-serif; }
+        .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); }
+        .bar-fill { transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .hero-overlay { background: linear-gradient(180deg, rgba(11,42,59,0.75) 0%, rgba(11,42,59,0.25) 100%); }
+        .fade-in { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
     </style>
-</head>
-<body>
-    <div class="card">
-
-        <button class="admin-toggle-btn" id="adminToggleBtn">🔒 مدیریت</button>
-
-        <h1 class="main-title">
-            📊 مدیریت متمرکز پروژه‌ها
-            <small>پایش سریع وضعیت عملیات اجرایی</small>
-        </h1>
-
-        <div class="date-section" id="dateSection">
-            <span class="date-item">📅 <strong>شمسی:</strong> <span class="shamsi" id="shamsiDate">...</span></span>
-            <span class="date-item">🌍 <strong>میلادی:</strong> <span class="miladi" id="miladiDate">...</span></span>
-            <span class="date-item">📆 <strong>روز هفته:</strong> <span id="weekday">...</span></span>
-        </div>
-
-        <div class="description-box">
-            <strong>📋 مدیریت متمرکز پروژه‌های فعال، گزارش‌ها، تأخیرات و تصمیم‌های روزانه</strong><br />
-            این صفحه برای <span class="highlight">پایش سریع وضعیت عملیات اجرایی</span>، شناسایی ریسک‌های زمانی، 
-            کنترل ثبت گزارش‌ها و هماهنگی بین <strong>دفتر فنی، کارگاه و واحد مالی</strong> طراحی شده است.
-        </div>
-
-        <div class="update-date-section">
-            <label>📌 آخرین آپدیت نمودارها:</label>
-            <input type="text" id="updateDateInput" placeholder="مثلاً 1405/04/16" />
-            <button class="update-btn" id="updateDateBtn">ثبت تاریخ</button>
-            <span style="font-size:0.8rem; color:#1a4356; opacity:0.6;" id="updateDateDisplay">(هنوز ثبت نشده)</span>
-        </div>
-
-        <!-- نمایش عکس پروژه‌ها (بدون رمز) -->
-        <div class="project-preview" id="projectPreview"></div>
-
-        <!-- پنل مدیریت -->
-        <div class="admin-panel" id="adminPanel">
-            <h3>🖼️ مدیریت تصویر اصلی صفحه</h3>
-            <label for="fileInput" class="upload-label">📤 آپلود عکس</label>
-            <input type="file" id="fileInput" accept="image/*" />
-            <div class="image-preview-container" id="imagePreviewContainer">
-                <img id="previewImage" src="" alt="تصویر" />
-                <div class="fallback-text" id="fallbackText">⬆️ برای آپلود کلیک کنید</div>
-            </div>
-            <button class="delete-btn" id="deleteBtn">🗑️ حذف عکس</button>
-            <div class="status-msg" id="statusMsg"></div>
-        </div>
-
-        <div class="links-grid" id="projectLinks">
-            <a href="project.html?name=حمزه" class="project-link" data-project="حمزه">حمزه</a>
-            <a href="project.html?name=بلوار مهر" class="project-link" data-project="بلوار مهر">بلوار مهر</a>
-            <a href="project.html?name=بهار آزادی" class="project-link" data-project="بهار آزادی">بهار آزادی</a>
-            <a href="project.html?name=ملاصدرا" class="project-link" data-project="ملاصدرا">ملاصدرا</a>
-            <a href="project.html?name=جابرانصاری" class="project-link" data-project="جابرانصاری">جابرانصاری</a>
-            <a href="project.html?name=آب۲۵۰" class="project-link" data-project="آب۲۵۰">آب۲۵۰</a>
-            <a href="project.html?name=فارابی" class="project-link" data-project="فارابی">فارابی</a>
-            <a href="project.html?name=سجاد" class="project-link" data-project="سجاد">سجاد</a>
-            <a href="project.html?name=توحید" class="project-link" data-project="توحید">توحید</a>
-        </div>
-
-        <div class="footer-note">
-            ✨ طراحی شده برای مدیریت پروژه‌های عمرانی · v2.0
-        </div>
-        <div class="secret-hint">💡 روی 🔒 مدیریت کلیک کنید · رمز: 1405</div>
+  <script src="/_sdk/0179d719c431a79e.data_sdk.js" type="text/javascript" integrity="sha512-OsRvJkI5GkC3MJQcgotQYotpzrMSX415GiKKgvYdxQEEkzD/fdchShO2FMSy0PJr/tiINMXOk5Vl2zAgg6bUiA=="></script>
+  <script src="/_sdk/9432170dbd2ae0df.resizing_sdk.js" type="text/javascript" integrity="sha512-FeT+58sb1f9ejWPWFjCbJvTT+SDwGV+ngrHUnlO7TWEOoqwOLj6p256kO3vOL7DIWl1cIgrobiof8v2bOigwPg=="></script>
+ </head>
+ <body data-template-id="__page-root" class="min-h-screen"><!-- Password Modal -->
+  <div id="pwModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.5)">
+   <div class="bg-white rounded-3xl p-8 w-80 text-center shadow-2xl">
+    <h3 class="text-lg font-bold text-gray-800 mb-4">🔑 رمز مدیریت</h3><input id="pwInput" type="password" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-lg mb-3 focus:outline-none focus:border-emerald-500" placeholder="رمز را وارد کنید">
+    <p id="pwError" class="text-red-500 text-sm mb-3 hidden">❌ رمز اشتباه است</p>
+    <div class="flex gap-3"><button id="pwSubmit" class="flex-1 bg-emerald-600 text-white rounded-xl py-2 font-bold hover:bg-emerald-700">ورود</button> <button id="pwCancel" class="flex-1 bg-gray-200 text-gray-700 rounded-xl py-2 font-bold hover:bg-gray-300">انصراف</button>
     </div>
+   </div>
+  </div>
+  <div class="max-w-6xl mx-auto p-4 md:p-6 w-full"><!-- Hero -->
+   <header class="relative rounded-[2rem] overflow-hidden mb-6 shadow-xl"><img data-template-id="hero-bg" class="canva-image w-full h-48 md:h-64 object-cover" loading="lazy">
+    <div class="hero-overlay absolute inset-0 flex flex-col items-center justify-center p-6">
+     <h1 data-template-id="main-title" class="canva-text text-white text-center font-bold drop-shadow-lg"></h1>
+     <p data-template-id="main-subtitle" class="canva-text text-white/80 text-center mt-2"></p>
+    </div><button id="adminBtn" class="absolute top-4 left-4 bg-white/20 backdrop-blur text-white border border-white/40 px-4 py-2 rounded-full text-sm font-semibold hover:bg-white/30 transition"> <span id="adminBtnLabel">🔒 مدیریت</span> </button>
+   </header><!-- Admin Bar -->
+   <div id="adminBar" class="hidden mb-4 p-3 bg-amber-50 border-2 border-dashed border-amber-400 rounded-2xl text-center text-sm text-amber-800 font-semibold fade-in">
+    ✏️ حالت ویرایش فعال — داده‌های جدول و نمودار قابل ویرایش هستند · <button id="adminExit" class="underline hover:text-red-600">خروج</button>
+   </div><!-- Date -->
+   <section data-template-id="date-section" class="canva-section glass rounded-full px-6 py-3 flex flex-wrap justify-center gap-4 md:gap-8 mb-6 shadow-sm border border-white/60"><span class="text-sm font-medium text-slate-700">📅 شمسی: <strong id="shamsiDate" class="text-emerald-700"></strong></span> <span class="text-sm font-medium text-slate-700">🌍 میلادی: <strong id="miladiDate" class="text-blue-700"></strong></span> <span class="text-sm font-medium text-slate-700">📆 <span id="weekday"></span></span>
+   </section><!-- Announcements -->
+   <section data-template-id="announce-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
+    <h2 data-template-id="announce-heading" class="canva-text font-bold mb-3"></h2>
+    <ul id="announceList" class="space-y-2 text-sm text-slate-700 leading-7">
+     <li data-template-id="announce-1" class="canva-text flex items-start gap-2"></li>
+     <li data-template-id="announce-2" class="canva-text flex items-start gap-2"></li>
+     <li data-template-id="announce-3" class="canva-text flex items-start gap-2"></li>
+    </ul>
+   </section><!-- Weekly Meetings -->
+   <section data-template-id="meetings-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
+    <h2 data-template-id="meetings-heading" class="canva-text font-bold mb-3"></h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+     <div data-template-id="meeting-1" class="canva-card rounded-2xl p-3 text-center">
+      <p data-template-id="meeting-1-text" class="canva-text text-sm font-semibold"></p>
+     </div>
+     <div data-template-id="meeting-2" class="canva-card rounded-2xl p-3 text-center">
+      <p data-template-id="meeting-2-text" class="canva-text text-sm font-semibold"></p>
+     </div>
+     <div data-template-id="meeting-3" class="canva-card rounded-2xl p-3 text-center">
+      <p data-template-id="meeting-3-text" class="canva-text text-sm font-semibold"></p>
+     </div>
+    </div>
+   </section><!-- SPI Chart -->
+   <section data-template-id="chart-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
+    <h2 data-template-id="chart-heading" class="canva-text font-bold mb-4"></h2>
+    <div id="spiChart" class="space-y-3"></div>
+    <p class="text-xs text-slate-500 mt-3 text-center">SPI &gt; 1 = جلوتر از برنامه · SPI = 1 = طبق برنامه · SPI &lt; 1 = عقب‌تر</p>
+   </section><!-- Comparison Table -->
+   <section data-template-id="table-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60 overflow-x-auto">
+    <h2 data-template-id="table-heading" class="canva-text font-bold mb-4"></h2>
+    <table class="w-full text-sm">
+     <thead>
+      <tr class="border-b border-slate-200">
+       <th class="py-2 px-3 text-right font-bold text-slate-700">پروژه</th>
+       <th class="py-2 px-3 text-center font-bold text-slate-700">SPI</th>
+       <th class="py-2 px-3 text-center font-bold text-slate-700">پیشرفت %</th>
+       <th class="py-2 px-3 text-center font-bold text-slate-700">انحراف (روز)</th>
+      </tr>
+     </thead>
+     <tbody id="compTable"></tbody>
+    </table>
+   </section><!-- Tips -->
+   <section data-template-id="tips-section" class="canva-card rounded-3xl p-5 mb-6 border-r-4 shadow-sm">
+    <h2 data-template-id="tips-heading" class="canva-text font-bold mb-3"></h2>
+    <ul class="space-y-2 text-sm leading-7 text-slate-700">
+     <li data-template-id="tip-1" class="canva-text"></li>
+     <li data-template-id="tip-2" class="canva-text"></li>
+     <li data-template-id="tip-3" class="canva-text"></li>
+     <li data-template-id="tip-4" class="canva-text"></li>
+     <li data-template-id="tip-5" class="canva-text"></li>
+    </ul>
+   </section><!-- Project Links -->
+   <section class="mb-6">
+    <h2 data-template-id="projects-heading" class="canva-text text-center font-bold mb-4"></h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"><a data-template-id="proj-1" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-2" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-3" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-4" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-5" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-6" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-7" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-8" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-9" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a>
+    </div>
+   </section>
+   <footer class="text-center border-t border-gray-200 pt-4">
+    <p data-template-id="footer-text" class="canva-text text-xs opacity-50"></p>
+   </footer>
+  </div>
+  <script src="/_sdk/719055fef2a85d14.editing_sdk.js" integrity="sha512-kFqrdGgIiTOsu307feB5Cy3JVP9IayftsmCIZ0csxYBGuBmJQPhyvcnmKR8F0fTW97h5s1gAvz3SumI8zJ6OxQ=="></script>
+  <script>
+(function(){
+    const PASSWORD = '1405';
+    let isAdmin = false;
 
-    <script>
-        (function() {
-            const ADMIN_PASSWORD = '1405';
+    // Projects data (stored in localStorage)
+    const PROJECTS = ['حمزه','بلوار مهر','بهار آزادی','ملاصدرا','جابرانصاری','آب۲۵۰','فارابی','سجاد','توحید'];
+    const DATA_KEY = 'dashboard_project_data';
 
-            // =========================================
-            // 1. تاریخ‌ها
-            // =========================================
-            function toPersianDate(date) {
-                const persian = new Intl.DateTimeFormat('fa-IR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                }).format(date);
-                const parts = persian.split('/');
-                if (parts.length === 3) {
-                    return parts[0] + '/' + parts[1] + '/' + parts[2];
-                }
-                return persian;
-            }
+    function getProjectData(){
+        const saved = localStorage.getItem(DATA_KEY);
+        if(saved) return JSON.parse(saved);
+        return PROJECTS.map(name=>({name, spi:1.0, progress:0, deviation:0}));
+    }
+    function saveProjectData(data){ localStorage.setItem(DATA_KEY, JSON.stringify(data)); }
 
-            function getWeekday(date) {
-                const weekdays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
-                return weekdays[date.getDay()];
-            }
+    // Date
+    const now = new Date();
+    const shamsi = new Intl.DateTimeFormat('fa-IR',{year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
+    const weekdays = ['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
+    document.getElementById('shamsiDate').textContent = shamsi;
+    document.getElementById('miladiDate').textContent = now.toLocaleDateString('en-US',{year:'numeric',month:'2-digit',day:'2-digit'});
+    document.getElementById('weekday').textContent = weekdays[now.getDay()];
 
-            const now = new Date();
-            document.getElementById('shamsiDate').textContent = toPersianDate(now);
-            document.getElementById('miladiDate').textContent = now.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
+    // Render chart
+    function renderChart(){
+        const data = getProjectData();
+        const maxSpi = Math.max(...data.map(d=>d.spi), 1.2);
+        const chart = document.getElementById('spiChart');
+        chart.innerHTML = '';
+        data.forEach(p=>{
+            const pct = Math.min((p.spi / maxSpi) * 100, 100);
+            const color = p.spi >= 1 ? '#059669' : p.spi >= 0.8 ? '#d97706' : '#dc2626';
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-3';
+            row.innerHTML = `
+                <span class="w-24 text-xs font-semibold text-slate-700 text-left shrink-0">${p.name}</span>
+                <div class="flex-1 h-7 bg-slate-100 rounded-full overflow-hidden relative">
+                    <div class="bar-fill h-full rounded-full" style="width:${pct}%;background:${color}"></div>
+                    <span class="absolute inset-0 flex items-center justify-center text-xs font-bold" style="color:${pct>40?'#fff':'#333'}">${p.spi.toFixed(2)}</span>
+                </div>
+            `;
+            chart.appendChild(row);
+        });
+    }
+
+    // Render table
+    function renderTable(){
+        const data = getProjectData();
+        const tbody = document.getElementById('compTable');
+        tbody.innerHTML = '';
+        // Sort by progress desc
+        const sorted = [...data].sort((a,b)=>b.progress - a.progress);
+        sorted.forEach((p,i)=>{
+            const devColor = p.deviation > 0 ? '#dc2626' : p.deviation < 0 ? '#059669' : '#6b7280';
+            const devText = p.deviation > 0 ? `+${p.deviation} روز تأخیر` : p.deviation < 0 ? `${p.deviation} روز جلوتر` : 'طبق برنامه';
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-slate-100 hover:bg-slate-50 transition';
+            tr.innerHTML = `
+                <td class="py-3 px-3 font-semibold text-slate-800">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'  '} ${p.name}</td>
+                <td class="py-3 px-3 text-center font-bold" style="color:${p.spi>=1?'#059669':'#dc2626'}">${p.spi.toFixed(2)}</td>
+                <td class="py-3 px-3 text-center">
+                    <div class="inline-flex items-center gap-2">
+                        <div class="w-20 h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full rounded-full bg-emerald-500" style="width:${p.progress}%"></div></div>
+                        <span class="font-bold text-slate-700">${p.progress}%</span>
+                    </div>
+                </td>
+                <td class="py-3 px-3 text-center font-semibold" style="color:${devColor}">${devText}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Admin edit table
+    function renderEditTable(){
+        const data = getProjectData();
+        const tbody = document.getElementById('compTable');
+        tbody.innerHTML = '';
+        data.forEach((p,i)=>{
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-slate-100';
+            tr.innerHTML = `
+                <td class="py-2 px-3 font-semibold text-slate-800">${p.name}</td>
+                <td class="py-2 px-3 text-center"><input type="number" step="0.01" value="${p.spi}" data-idx="${i}" data-field="spi" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
+                <td class="py-2 px-3 text-center"><input type="number" step="1" min="0" max="100" value="${p.progress}" data-idx="${i}" data-field="progress" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
+                <td class="py-2 px-3 text-center"><input type="number" step="1" value="${p.deviation}" data-idx="${i}" data-field="deviation" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        // Save on change
+        tbody.querySelectorAll('.admin-input').forEach(input=>{
+            input.addEventListener('change', ()=>{
+                const d = getProjectData();
+                const idx = parseInt(input.dataset.idx);
+                const field = input.dataset.field;
+                d[idx][field] = parseFloat(input.value) || 0;
+                saveProjectData(d);
+                renderChart();
             });
-            document.getElementById('weekday').textContent = getWeekday(now);
+        });
+    }
 
-            // =========================================
-            // 2. تاریخ آپدیت
-            // =========================================
-            const UPDATE_KEY = 'mainUpdateDate';
-            const updateInput = document.getElementById('updateDateInput');
-            const updateDisplay = document.getElementById('updateDateDisplay');
-            const updateBtn = document.getElementById('updateDateBtn');
+    renderChart();
+    renderTable();
 
-            const savedUpdate = localStorage.getItem(UPDATE_KEY);
-            if (savedUpdate) {
-                updateInput.value = savedUpdate;
-                updateDisplay.textContent = '📅 ' + savedUpdate;
-            }
+    // Admin
+    const modal = document.getElementById('pwModal');
+    const pwInput = document.getElementById('pwInput');
+    const pwError = document.getElementById('pwError');
 
-            updateBtn.addEventListener('click', function() {
-                const val = updateInput.value.trim();
-                if (val) {
-                    localStorage.setItem(UPDATE_KEY, val);
-                    updateDisplay.textContent = '📅 ' + val;
-                    showStatus('✅ تاریخ آپدیت ثبت شد: ' + val);
-                } else {
-                    showStatus('⚠️ لطفاً تاریخی وارد کنید.', false);
-                }
-            });
+    document.getElementById('adminBtn').addEventListener('click',()=>{
+        if(!isAdmin){
+            modal.classList.remove('hidden');
+            modal.style.display='flex';
+            pwInput.value='';
+            pwError.classList.add('hidden');
+            pwInput.focus();
+        } else { exitAdmin(); }
+    });
+    document.getElementById('pwCancel').addEventListener('click',()=>{ modal.classList.add('hidden'); modal.style.display=''; });
+    document.getElementById('pwSubmit').addEventListener('click', tryLogin);
+    pwInput.addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
 
-            // =========================================
-            // 3. نمایش عکس پروژه‌ها (بدون رمز)
-            // =========================================
-            const projectNames = ['حمزه', 'بلوار مهر', 'بهار آزادی', 'ملاصدرا', 'جابرانصاری', 'آب۲۵۰', 'فارابی', 'سجاد', 'توحید'];
-            const previewContainer = document.getElementById('projectPreview');
+    function tryLogin(){
+        if(pwInput.value===PASSWORD){ modal.classList.add('hidden'); modal.style.display=''; enterAdmin(); }
+        else { pwError.classList.remove('hidden'); }
+    }
+    function enterAdmin(){
+        isAdmin=true;
+        document.getElementById('adminBar').classList.remove('hidden');
+        document.getElementById('adminBtnLabel').textContent='🔓 خروج';
+        renderEditTable();
+    }
+    function exitAdmin(){
+        isAdmin=false;
+        document.getElementById('adminBar').classList.add('hidden');
+        document.getElementById('adminBtnLabel').textContent='🔒 مدیریت';
+        renderTable();
+    }
+    document.getElementById('adminExit').addEventListener('click', exitAdmin);
 
-            projectNames.forEach(name => {
-                const key = 'projectImage_' + name;
-                const savedImage = localStorage.getItem(key);
-                const item = document.createElement('div');
-                item.className = 'project-preview-item';
-
-                const nameSpan = document.createElement('div');
-                nameSpan.className = 'pname';
-                nameSpan.textContent = name;
-                item.appendChild(nameSpan);
-
-                const img = document.createElement('img');
-                if (savedImage) {
-                    img.src = savedImage;
-                    img.className = 'visible';
-                } else {
-                    img.style.display = 'none';
-                }
-                item.appendChild(img);
-
-                if (!savedImage) {
-                    const noImg = document.createElement('div');
-                    noImg.className = 'no-image';
-                    noImg.textContent = '📷 عکسی وجود ندارد';
-                    item.appendChild(noImg);
-                }
-
-                previewContainer.appendChild(item);
-            });
-
-            // =========================================
-            // 4. مدیریت تصویر اصلی
-            // =========================================
-            const IMAGE_KEY = 'mainPageImage';
-            let isAdminMode = false;
-
-            const adminToggleBtn = document.getElementById('adminToggleBtn');
-            const adminPanel = document.getElementById('adminPanel');
-            const fileInput = document.getElementById('fileInput');
-            const previewImage = document.getElementById('previewImage');
-            const fallbackText = document.getElementById('fallbackText');
-            const deleteBtn = document.getElementById('deleteBtn');
-            const imgPreviewContainer = document.getElementById('imagePreviewContainer');
-            const statusMsg = document.getElementById('statusMsg');
-
-            function loadMainImage() {
-                const saved = localStorage.getItem(IMAGE_KEY);
-                if (saved) {
-                    previewImage.src = saved;
-                    previewImage.style.display = 'block';
-                    fallbackText.style.display = 'none';
-                    deleteBtn.style.display = 'inline-block';
-                } else {
-                    previewImage.style.display = 'none';
-                    fallbackText.style.display = 'block';
-                    deleteBtn.style.display = 'none';
-                }
-            }
-            loadMainImage();
-
-            function showStatus(msg, isSuccess = true) {
-                statusMsg.textContent = msg;
-                statusMsg.style.color = isSuccess ? '#1a6e3a' : '#c0392b';
-                statusMsg.className = 'status-msg show';
-                setTimeout(() => {
-                    statusMsg.classList.remove('show');
-                }, 3500);
-            }
-
-            function toggleAdmin() {
-                if (!isAdminMode) {
-                    const password = prompt('🔑 لطفاً رمز مدیریت را وارد کنید:');
-                    if (password === ADMIN_PASSWORD) {
-                        isAdminMode = true;
-                        adminPanel.classList.add('visible');
-                        adminToggleBtn.textContent = '🔓 بستن مدیریت';
-                        adminToggleBtn.classList.add('active');
-                        showStatus('✅ وارد حالت مدیریت شدید.');
-                    } else if (password !== null) {
-                        showStatus('❌ رمز اشتباه است!', false);
-                    }
-                } else {
-                    isAdminMode = false;
-                    adminPanel.classList.remove('visible');
-                    adminToggleBtn.textContent = '🔒 مدیریت';
-                    adminToggleBtn.classList.remove('active');
-                    showStatus('🔒 از حالت مدیریت خارج شدید.');
-                }
-            }
-
-            adminToggleBtn.addEventListener('click', toggleAdmin);
-
-            fileInput.addEventListener('change', function(e) {
-                if (!isAdminMode) {
-                    showStatus('⚠️ ابتدا وارد حالت مدیریت شوید.', false);
-                    return;
-                }
-                const file = e.target.files[0];
-                if (!file) return;
-
-                if (!file.type.startsWith('image/')) {
-                    showStatus('❌ لطفاً فایل تصویری انتخاب کنید.', false);
-                    fileInput.value = '';
-                    return;
-                }
-
-                if (file.size > 3 * 1024 * 1024) {
-                    showStatus('❌ حجم فایل نباید بیشتر از ۳ مگابایت باشد.', false);
-                    fileInput.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    const data = ev.target.result;
-                    localStorage.setItem(IMAGE_KEY, data);
-                    previewImage.src = data;
-                    previewImage.style.display = 'block';
-                    fallbackText.style.display = 'none';
-                    deleteBtn.style.display = 'inline-block';
-                    showStatus('✅ عکس با موفقیت ذخیره شد!');
-                };
-                reader.readAsDataURL(file);
-            });
-
-            deleteBtn.addEventListener('click', function() {
-                if (!isAdminMode) {
-                    showStatus('⚠️ ابتدا وارد حالت مدیریت شوید.', false);
-                    return;
-                }
-                if (confirm('آیا عکس حذف شود؟')) {
-                    localStorage.removeItem(IMAGE_KEY);
-                    loadMainImage();
-                    showStatus('🗑️ عکس حذف شد.');
-                }
-            });
-
-            imgPreviewContainer.addEventListener('click', function() {
-                if (isAdminMode) {
-                    fileInput.click();
-                }
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.altKey && !e.metaKey) {
-                    e.preventDefault();
-                    toggleAdmin();
-                }
-            });
-
-            // نمایش ✅ برای پروژه‌هایی که عکس دارند
-            document.querySelectorAll('.project-link').forEach(link => {
-                const pName = link.dataset.project;
-                const key = 'projectImage_' + pName;
-                if (localStorage.getItem(key)) {
-                    link.classList.add('has-image');
-                }
-            });
-
-            console.log('📊 مدیریت متمرکز پروژه‌ها - نسخه ۲.۰');
-            console.log('🔑 رمز مدیریت:', ADMIN_PASSWORD);
-        })();
-    </script>
-</body>
+    lucide.createIcons();
+})();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a17d6b79711316db',t:'MTc4MzQ5NjIwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
