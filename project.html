@@ -1,248 +1,812 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
- <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260708-05-579f504"}');</script><script src="/_sdk/f432b76fb310b513.telemetry_sdk.js" integrity="sha512-9FJQ55EKmmqhyyik8BhrMVfm0+iYYfb8uOlRsjtkxJMEI97qOVEI4PnHohDjQAtvAep0IOEpdQ64eki0sz62ug=="></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>داشبورد مدیریت پروژه‌ها</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <style>
-        body { font-family: 'DM Sans', 'Tahoma', sans-serif; }
-        .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); }
-        .bar-fill { transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
-        .hero-overlay { background: linear-gradient(180deg, rgba(11,42,59,0.75) 0%, rgba(11,42,59,0.25) 100%); }
-        .fade-in { animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>پروژه</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef3f7 0%, #d0dce8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border-radius: 48px;
+            padding: 30px 30px 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: #1f556e;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 6px 16px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 40px;
+            transition: 0.2s;
+        }
+
+        .back-link:hover {
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .project-name {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #0b2a3b;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 4px 24px;
+            border-radius: 60px;
+        }
+
+        .view-counter {
+            background: #1e3b4f;
+            color: white;
+            padding: 8px 22px;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .view-counter span {
+            background: #ffd966;
+            color: #1e3b4f;
+            padding: 0 14px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .admin-toggle-btn {
+            position: absolute;
+            top: 18px;
+            left: 22px;
+            background: rgba(30, 59, 79, 0.1);
+            border: 2px dashed rgba(30, 59, 79, 0.3);
+            color: #1e3b4f;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            z-index: 10;
+            font-weight: 600;
+        }
+
+        .admin-toggle-btn:hover {
+            background: rgba(30, 59, 79, 0.2);
+            border-color: #1e3b4f;
+        }
+
+        .admin-toggle-btn.active {
+            background: #1e3b4f;
+            color: white;
+            border-color: #1e3b4f;
+        }
+
+        .admin-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+            margin: 16px 0 20px 0;
+        }
+
+        .admin-panel.visible {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upload-section {
+            background: rgba(235, 245, 250, 0.5);
+            border-radius: 36px;
+            padding: 20px 20px 12px;
+            border: 2px dashed #3f6b7c;
+            text-align: center;
+        }
+
+        .upload-label {
+            display: inline-block;
+            background: #1e3b4f;
+            color: white;
+            padding: 14px 40px;
+            border-radius: 60px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .upload-label:hover {
+            background: #14303f;
+            transform: scale(1.02);
+        }
+
+        .upload-label:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .image-preview-container {
+            margin: 18px auto 6px;
+            max-width: 100%;
+            border-radius: 28px;
+            overflow: hidden;
+            background: #eef4f9;
+            min-height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #bfd7e3;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .image-preview-container:hover {
+            background: #e3ecf3;
+        }
+
+        #previewImage {
+            max-width: 100%;
+            max-height: 420px;
+            display: none;
+            border-radius: 24px;
+        }
+
+        .fallback-text {
+            color: #3f5f70;
+            padding: 30px 20px;
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .public-image-container {
+            margin: 10px 0 16px 0;
+            text-align: center;
+            border-radius: 24px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.3);
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .public-image-container img {
+            max-width: 100%;
+            max-height: 400px;
+            display: none;
+            border-radius: 20px;
+        }
+
+        .public-image-container .no-image-text {
+            color: #3f5f70;
+            padding: 30px;
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+
+        .public-image-container img.visible {
+            display: block;
+        }
+
+        .delete-btn {
+            margin-top: 12px;
+            padding: 8px 24px;
+            background: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: none;
+        }
+
+        .delete-btn:hover {
+            background: #a93226;
+            transform: scale(1.02);
+        }
+
+        .delete-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-msg {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #1e7e34;
+            opacity: 0;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .status-msg.show {
+            opacity: 1;
+        }
+
+        .status-msg.loading {
+            color: #f39c12;
+        }
+
+        .status-msg.error {
+            color: #c0392b;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e7ed;
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar .progress-fill {
+            height: 100%;
+            background: #1a6e3a;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .footer-note {
+            margin-top: 24px;
+            text-align: center;
+            color: #1e4b5e;
+            opacity: 0.5;
+            font-size: 0.8rem;
+        }
+
+        .secret-hint {
+            text-align: center;
+            margin-top: 4px;
+            font-size: 0.7rem;
+            color: #1e4b5e;
+            opacity: 0.15;
+            transition: 0.3s;
+        }
+
+        .secret-hint:hover {
+            opacity: 0.5;
+        }
+
+        .public-link {
+            margin-top: 12px;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 8px;
+            color: #1a6e3a;
+            font-size: 0.85rem;
+            word-break: break-all;
+            display: none;
+        }
+
+        .copy-link-btn {
+            background: #1a6e3a;
+            color: white;
+            padding: 6px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        .copy-link-btn:hover {
+            background: #0f522a;
+        }
+
+        .info-box {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #e3ecf3;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #1a4356;
+            text-align: center;
+        }
+
+        .image-status {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .image-status.found {
+            background: #d4edda;
+            color: #1a6e3a;
+        }
+
+        .image-status.not-found {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 600px) {
+            .project-name { font-size: 1.6rem; }
+            .card { padding: 20px 14px; }
+            .admin-toggle-btn { 
+                top: 12px;
+                left: 12px;
+                padding: 6px 12px;
+                font-size: 0.7rem;
+            }
+        }
     </style>
-  <script src="/_sdk/0179d719c431a79e.data_sdk.js" type="text/javascript" integrity="sha512-OsRvJkI5GkC3MJQcgotQYotpzrMSX415GiKKgvYdxQEEkzD/fdchShO2FMSy0PJr/tiINMXOk5Vl2zAgg6bUiA=="></script>
-  <script src="/_sdk/9432170dbd2ae0df.resizing_sdk.js" type="text/javascript" integrity="sha512-FeT+58sb1f9ejWPWFjCbJvTT+SDwGV+ngrHUnlO7TWEOoqwOLj6p256kO3vOL7DIWl1cIgrobiof8v2bOigwPg=="></script>
- </head>
- <body data-template-id="__page-root" class="min-h-screen"><!-- Password Modal -->
-  <div id="pwModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.5)">
-   <div class="bg-white rounded-3xl p-8 w-80 text-center shadow-2xl">
-    <h3 class="text-lg font-bold text-gray-800 mb-4">🔑 رمز مدیریت</h3><input id="pwInput" type="password" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-lg mb-3 focus:outline-none focus:border-emerald-500" placeholder="رمز را وارد کنید">
-    <p id="pwError" class="text-red-500 text-sm mb-3 hidden">❌ رمز اشتباه است</p>
-    <div class="flex gap-3"><button id="pwSubmit" class="flex-1 bg-emerald-600 text-white rounded-xl py-2 font-bold hover:bg-emerald-700">ورود</button> <button id="pwCancel" class="flex-1 bg-gray-200 text-gray-700 rounded-xl py-2 font-bold hover:bg-gray-300">انصراف</button>
-    </div>
-   </div>
-  </div>
-  <div class="max-w-6xl mx-auto p-4 md:p-6 w-full"><!-- Hero -->
-   <header class="relative rounded-[2rem] overflow-hidden mb-6 shadow-xl"><img data-template-id="hero-bg" class="canva-image w-full h-48 md:h-64 object-cover" loading="lazy">
-    <div class="hero-overlay absolute inset-0 flex flex-col items-center justify-center p-6">
-     <h1 data-template-id="main-title" class="canva-text text-white text-center font-bold drop-shadow-lg"></h1>
-     <p data-template-id="main-subtitle" class="canva-text text-white/80 text-center mt-2"></p>
-    </div><button id="adminBtn" class="absolute top-4 left-4 bg-white/20 backdrop-blur text-white border border-white/40 px-4 py-2 rounded-full text-sm font-semibold hover:bg-white/30 transition"> <span id="adminBtnLabel">🔒 مدیریت</span> </button>
-   </header><!-- Admin Bar -->
-   <div id="adminBar" class="hidden mb-4 p-3 bg-amber-50 border-2 border-dashed border-amber-400 rounded-2xl text-center text-sm text-amber-800 font-semibold fade-in">
-    ✏️ حالت ویرایش فعال — داده‌های جدول و نمودار قابل ویرایش هستند · <button id="adminExit" class="underline hover:text-red-600">خروج</button>
-   </div><!-- Date -->
-   <section data-template-id="date-section" class="canva-section glass rounded-full px-6 py-3 flex flex-wrap justify-center gap-4 md:gap-8 mb-6 shadow-sm border border-white/60"><span class="text-sm font-medium text-slate-700">📅 شمسی: <strong id="shamsiDate" class="text-emerald-700"></strong></span> <span class="text-sm font-medium text-slate-700">🌍 میلادی: <strong id="miladiDate" class="text-blue-700"></strong></span> <span class="text-sm font-medium text-slate-700">📆 <span id="weekday"></span></span>
-   </section><!-- Announcements -->
-   <section data-template-id="announce-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
-    <h2 data-template-id="announce-heading" class="canva-text font-bold mb-3"></h2>
-    <ul id="announceList" class="space-y-2 text-sm text-slate-700 leading-7">
-     <li data-template-id="announce-1" class="canva-text flex items-start gap-2"></li>
-     <li data-template-id="announce-2" class="canva-text flex items-start gap-2"></li>
-     <li data-template-id="announce-3" class="canva-text flex items-start gap-2"></li>
-    </ul>
-   </section><!-- Weekly Meetings -->
-   <section data-template-id="meetings-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
-    <h2 data-template-id="meetings-heading" class="canva-text font-bold mb-3"></h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-     <div data-template-id="meeting-1" class="canva-card rounded-2xl p-3 text-center">
-      <p data-template-id="meeting-1-text" class="canva-text text-sm font-semibold"></p>
-     </div>
-     <div data-template-id="meeting-2" class="canva-card rounded-2xl p-3 text-center">
-      <p data-template-id="meeting-2-text" class="canva-text text-sm font-semibold"></p>
-     </div>
-     <div data-template-id="meeting-3" class="canva-card rounded-2xl p-3 text-center">
-      <p data-template-id="meeting-3-text" class="canva-text text-sm font-semibold"></p>
-     </div>
-    </div>
-   </section><!-- SPI Chart -->
-   <section data-template-id="chart-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
-    <h2 data-template-id="chart-heading" class="canva-text font-bold mb-4"></h2>
-    <div id="spiChart" class="space-y-3"></div>
-    <p class="text-xs text-slate-500 mt-3 text-center">SPI &gt; 1 = جلوتر از برنامه · SPI = 1 = طبق برنامه · SPI &lt; 1 = عقب‌تر</p>
-   </section><!-- Comparison Table -->
-   <section data-template-id="table-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60 overflow-x-auto">
-    <h2 data-template-id="table-heading" class="canva-text font-bold mb-4"></h2>
-    <table class="w-full text-sm">
-     <thead>
-      <tr class="border-b border-slate-200">
-       <th class="py-2 px-3 text-right font-bold text-slate-700">پروژه</th>
-       <th class="py-2 px-3 text-center font-bold text-slate-700">SPI</th>
-       <th class="py-2 px-3 text-center font-bold text-slate-700">پیشرفت %</th>
-       <th class="py-2 px-3 text-center font-bold text-slate-700">انحراف (روز)</th>
-      </tr>
-     </thead>
-     <tbody id="compTable"></tbody>
-    </table>
-   </section><!-- Tips -->
-   <section data-template-id="tips-section" class="canva-card rounded-3xl p-5 mb-6 border-r-4 shadow-sm">
-    <h2 data-template-id="tips-heading" class="canva-text font-bold mb-3"></h2>
-    <ul class="space-y-2 text-sm leading-7 text-slate-700">
-     <li data-template-id="tip-1" class="canva-text"></li>
-     <li data-template-id="tip-2" class="canva-text"></li>
-     <li data-template-id="tip-3" class="canva-text"></li>
-     <li data-template-id="tip-4" class="canva-text"></li>
-     <li data-template-id="tip-5" class="canva-text"></li>
-    </ul>
-   </section><!-- Project Links -->
-   <section class="mb-6">
-    <h2 data-template-id="projects-heading" class="canva-text text-center font-bold mb-4"></h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"><a data-template-id="proj-1" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-2" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-3" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-4" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-5" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-6" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-7" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-8" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-9" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a>
-    </div>
-   </section>
-   <footer class="text-center border-t border-gray-200 pt-4">
-    <p data-template-id="footer-text" class="canva-text text-xs opacity-50"></p>
-   </footer>
-  </div>
-  <script src="/_sdk/719055fef2a85d14.editing_sdk.js" integrity="sha512-kFqrdGgIiTOsu307feB5Cy3JVP9IayftsmCIZ0csxYBGuBmJQPhyvcnmKR8F0fTW97h5s1gAvz3SumI8zJ6OxQ=="></script>
-  <script>
-(function(){
-    const PASSWORD = '1405';
-    let isAdmin = false;
+</head>
+<body>
+    <div class="card">
 
-    // Projects data (stored in localStorage)
-    const PROJECTS = ['حمزه','بلوار مهر','بهار آزادی','ملاصدرا','جابرانصاری','آب۲۵۰','فارابی','سجاد','توحید'];
-    const DATA_KEY = 'dashboard_project_data';
+        <button class="admin-toggle-btn" id="adminToggleBtn">🔒 مدیریت</button>
 
-    function getProjectData(){
-        const saved = localStorage.getItem(DATA_KEY);
-        if(saved) return JSON.parse(saved);
-        return PROJECTS.map(name=>({name, spi:1.0, progress:0, deviation:0}));
-    }
-    function saveProjectData(data){ localStorage.setItem(DATA_KEY, JSON.stringify(data)); }
+        <a href="index.html" class="back-link">⬅ بازگشت به لیست پروژه‌ها</a>
 
-    // Date
-    const now = new Date();
-    const shamsi = new Intl.DateTimeFormat('fa-IR',{year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
-    const weekdays = ['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
-    document.getElementById('shamsiDate').textContent = shamsi;
-    document.getElementById('miladiDate').textContent = now.toLocaleDateString('en-US',{year:'numeric',month:'2-digit',day:'2-digit'});
-    document.getElementById('weekday').textContent = weekdays[now.getDay()];
+        <div class="project-header">
+            <div class="project-name" id="projectName">پروژه</div>
+            <div class="view-counter">
+                👁️ بازدید <span id="viewCount">0</span>
+            </div>
+        </div>
 
-    // Render chart
-    function renderChart(){
-        const data = getProjectData();
-        const maxSpi = Math.max(...data.map(d=>d.spi), 1.2);
-        const chart = document.getElementById('spiChart');
-        chart.innerHTML = '';
-        data.forEach(p=>{
-            const pct = Math.min((p.spi / maxSpi) * 100, 100);
-            const color = p.spi >= 1 ? '#059669' : p.spi >= 0.8 ? '#d97706' : '#dc2626';
-            const row = document.createElement('div');
-            row.className = 'flex items-center gap-3';
-            row.innerHTML = `
-                <span class="w-24 text-xs font-semibold text-slate-700 text-left shrink-0">${p.name}</span>
-                <div class="flex-1 h-7 bg-slate-100 rounded-full overflow-hidden relative">
-                    <div class="bar-fill h-full rounded-full" style="width:${pct}%;background:${color}"></div>
-                    <span class="absolute inset-0 flex items-center justify-center text-xs font-bold" style="color:${pct>40?'#fff':'#333'}">${p.spi.toFixed(2)}</span>
+        <div class="public-image-container" id="publicImageContainer">
+            <img id="publicImage" src="" alt="نمودار پیشرفت" />
+            <div class="no-image-text" id="noImageText">📷 عکسی برای این پروژه آپلود نشده است</div>
+        </div>
+
+        <div id="imageStatus" class="image-status"></div>
+
+        <div class="admin-panel" id="adminPanel">
+            <div class="upload-section">
+                <div class="info-box">
+                    📁 عکس‌ها در پوشه <strong>uploads/</strong> ریپازیتوری <strong>Dash-Project-006</strong> ذخیره می‌شوند
                 </div>
-            `;
-            chart.appendChild(row);
-        });
-    }
 
-    // Render table
-    function renderTable(){
-        const data = getProjectData();
-        const tbody = document.getElementById('compTable');
-        tbody.innerHTML = '';
-        // Sort by progress desc
-        const sorted = [...data].sort((a,b)=>b.progress - a.progress);
-        sorted.forEach((p,i)=>{
-            const devColor = p.deviation > 0 ? '#dc2626' : p.deviation < 0 ? '#059669' : '#6b7280';
-            const devText = p.deviation > 0 ? `+${p.deviation} روز تأخیر` : p.deviation < 0 ? `${p.deviation} روز جلوتر` : 'طبق برنامه';
-            const tr = document.createElement('tr');
-            tr.className = 'border-b border-slate-100 hover:bg-slate-50 transition';
-            tr.innerHTML = `
-                <td class="py-3 px-3 font-semibold text-slate-800">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'  '} ${p.name}</td>
-                <td class="py-3 px-3 text-center font-bold" style="color:${p.spi>=1?'#059669':'#dc2626'}">${p.spi.toFixed(2)}</td>
-                <td class="py-3 px-3 text-center">
-                    <div class="inline-flex items-center gap-2">
-                        <div class="w-20 h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full rounded-full bg-emerald-500" style="width:${p.progress}%"></div></div>
-                        <span class="font-bold text-slate-700">${p.progress}%</span>
-                    </div>
-                </td>
-                <td class="py-3 px-3 text-center font-semibold" style="color:${devColor}">${devText}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
+                <label for="fileInput" class="upload-label" id="uploadLabel">📤 آپلود/جایگزینی عکس</label>
+                <input type="file" id="fileInput" accept="image/*" />
+                
+                <div class="image-preview-container" id="imagePreviewContainer">
+                    <img id="previewImage" src="" alt="نمودار" />
+                    <div class="fallback-text" id="fallbackText">⬆️ برای آپلود کلیک کنید</div>
+                </div>
+                
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <button class="delete-btn" id="deleteBtn">🗑️ حذف عکس</button>
+                
+                <p style="font-size: 0.8rem; color: #1d4b5e; margin-top: 4px; opacity: 0.7;">
+                    PNG, JPG, SVG · حداکثر ۵ مگابایت
+                </p>
+                
+                <div class="status-msg" id="statusMsg"></div>
+                
+                <div class="public-link" id="publicLink">
+                    <strong>✅ لینک عمومی:</strong>
+                    <div id="linkText" style="margin-top: 8px; padding: 8px; background: white; border-radius: 4px;"></div>
+                    <button class="copy-link-btn" onclick="copyPublicLink()">📋 کپی لینک</button>
+                </div>
+            </div>
+        </div>
 
-    // Admin edit table
-    function renderEditTable(){
-        const data = getProjectData();
-        const tbody = document.getElementById('compTable');
-        tbody.innerHTML = '';
-        data.forEach((p,i)=>{
-            const tr = document.createElement('tr');
-            tr.className = 'border-b border-slate-100';
-            tr.innerHTML = `
-                <td class="py-2 px-3 font-semibold text-slate-800">${p.name}</td>
-                <td class="py-2 px-3 text-center"><input type="number" step="0.01" value="${p.spi}" data-idx="${i}" data-field="spi" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
-                <td class="py-2 px-3 text-center"><input type="number" step="1" min="0" max="100" value="${p.progress}" data-idx="${i}" data-field="progress" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
-                <td class="py-2 px-3 text-center"><input type="number" step="1" value="${p.deviation}" data-idx="${i}" data-field="deviation" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
-            `;
-            tbody.appendChild(tr);
-        });
-        // Save on change
-        tbody.querySelectorAll('.admin-input').forEach(input=>{
-            input.addEventListener('change', ()=>{
-                const d = getProjectData();
-                const idx = parseInt(input.dataset.idx);
-                const field = input.dataset.field;
-                d[idx][field] = parseFloat(input.value) || 0;
-                saveProjectData(d);
-                renderChart();
+        <div class="footer-note">
+            📌 عکس‌ها در GitHub ذخیره می‌شوند · 🔑 رمز مدیریت: 1405
+        </div>
+        <div class="secret-hint">💡 روی 🔒 مدیریت کلیک کنید یا کلید M را بزنید</div>
+    </div>
+
+    <script>
+        (function() {
+            const ADMIN_PASSWORD = '1405';
+            const GITHUB_USERNAME = 'danialmor';
+            const GITHUB_REPO = 'Dash-Project-006';  // ✅ اصلاح شد
+            const UPLOAD_PATH = 'uploads';
+
+            // =========================================
+            // نگاشت نام پروژه به نام فایل
+            // =========================================
+            const FILE_NAME_MAP = {
+                'حمزه': 'hamze.png',
+                'بلوار مهر': 'bolvarmehr.png',
+                'بهار آزادی': 'bahareazadi.png',
+                'ملاصدرا': 'molasadra.png',
+                'جابرانصاری': 'jaberansari.png',
+                'آب۲۵۰': 'ab250.png',
+                'فارابی': 'farabi.png',
+                'سجاد': 'sajjad.png',
+                'توحید': 'tohid.png'
+            };
+
+            // =========================================
+            // دریافت نام پروژه
+            // =========================================
+            const params = new URLSearchParams(window.location.search);
+            const projectName = params.get('name') || 'پروژه';
+            document.getElementById('projectName').textContent = projectName;
+
+            // =========================================
+            // پیدا کردن نام فایل متناظر
+            // =========================================
+            const fileName = FILE_NAME_MAP[projectName] || null;
+            const imageUrl = fileName ? 
+                `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${GITHUB_REPO}/main/${UPLOAD_PATH}/${fileName}` : 
+                null;
+
+            // =========================================
+            // کلیدهای ذخیره‌سازی
+            // =========================================
+            const IMAGE_URL_KEY = 'projectImageUrl_' + projectName;
+            const VIEW_KEY = 'projectView_' + projectName;
+
+            // =========================================
+            // شمارنده بازدید
+            // =========================================
+            let views = parseInt(localStorage.getItem(VIEW_KEY), 10) || 0;
+            views += 1;
+            localStorage.setItem(VIEW_KEY, views);
+            document.getElementById('viewCount').textContent = views;
+
+            // =========================================
+            // المان‌ها
+            // =========================================
+            const adminToggleBtn = document.getElementById('adminToggleBtn');
+            const adminPanel = document.getElementById('adminPanel');
+            const fileInput = document.getElementById('fileInput');
+            const previewImage = document.getElementById('previewImage');
+            const fallbackText = document.getElementById('fallbackText');
+            const deleteBtn = document.getElementById('deleteBtn');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const statusMsg = document.getElementById('statusMsg');
+            const uploadLabel = document.getElementById('uploadLabel');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const publicImage = document.getElementById('publicImage');
+            const noImageText = document.getElementById('noImageText');
+            const publicLink = document.getElementById('publicLink');
+            const linkText = document.getElementById('linkText');
+            const imageStatus = document.getElementById('imageStatus');
+
+            let isAdminMode = false;
+            let isUploading = false;
+
+            // =========================================
+            // بارگذاری عکس
+            // =========================================
+            function loadImage() {
+                const savedUrl = localStorage.getItem(IMAGE_URL_KEY);
+                
+                if (savedUrl && savedUrl.startsWith('http')) {
+                    showImage(savedUrl, '✅ عکس آپلود شده توسط شما');
+                    return;
+                }
+
+                if (imageUrl) {
+                    fetch(imageUrl, { method: 'HEAD' })
+                        .then(response => {
+                            if (response.ok) {
+                                showImage(imageUrl, '✅ عکس از پوشه uploads بارگذاری شد');
+                            } else {
+                                showNoImage('📷 عکسی برای این پروژه در پوشه uploads وجود ندارد');
+                            }
+                        })
+                        .catch(() => {
+                            showNoImage('📷 عکسی برای این پروژه در پوشه uploads وجود ندارد');
+                        });
+                } else {
+                    showNoImage('📷 نام فایل برای این پروژه تعریف نشده است');
+                }
+            }
+
+            function showImage(url, statusText) {
+                publicImage.src = url;
+                publicImage.className = 'visible';
+                noImageText.style.display = 'none';
+                
+                previewImage.src = url;
+                previewImage.style.display = 'block';
+                fallbackText.style.display = 'none';
+                deleteBtn.style.display = 'inline-block';
+                
+                linkText.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+                publicLink.style.display = 'block';
+                
+                imageStatus.className = 'image-status found';
+                imageStatus.textContent = statusText;
+            }
+
+            function showNoImage(statusText) {
+                publicImage.className = '';
+                publicImage.style.display = 'none';
+                noImageText.style.display = 'block';
+                
+                previewImage.style.display = 'none';
+                fallbackText.style.display = 'block';
+                deleteBtn.style.display = 'none';
+                publicLink.style.display = 'none';
+                
+                imageStatus.className = 'image-status not-found';
+                imageStatus.textContent = statusText;
+            }
+
+            loadImage();
+
+            // =========================================
+            // نمایش پیام
+            // =========================================
+            function showStatus(msg, type = 'success') {
+                statusMsg.textContent = msg;
+                statusMsg.className = 'status-msg show';
+                if (type === 'loading') {
+                    statusMsg.className = 'status-msg show loading';
+                } else if (type === 'error') {
+                    statusMsg.className = 'status-msg show error';
+                } else {
+                    statusMsg.className = 'status-msg show';
+                    statusMsg.style.color = '#1a6e3a';
+                }
+                setTimeout(() => {
+                    statusMsg.classList.remove('show');
+                }, 6000);
+            }
+
+            // =========================================
+            // آپلود عکس به GitHub
+            // =========================================
+            async function uploadToGitHub(file) {
+                return new Promise((resolve, reject) => {
+                    const token = prompt('🔑 لطفاً Token GitHub خود را وارد کنید:');
+                    if (!token) {
+                        reject(new Error('Token وارد نشد'));
+                        return;
+                    }
+
+                    const timestamp = Date.now();
+                    const ext = file.name.split('.').pop();
+                    const uploadFileName = `${projectName}_${timestamp}.${ext}`;
+                    
+                    const reader = new FileReader();
+
+                    reader.onload = async (e) => {
+                        try {
+                            const base64 = e.target.result.split(',')[1];
+                            
+                            const response = await fetch(
+                                `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${UPLOAD_PATH}/${uploadFileName}`,
+                                {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Authorization': `token ${token}`,
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        message: `آپلود نمودار: ${projectName}`,
+                                        content: base64
+                                    })
+                                }
+                            );
+
+                            const data = await response.json();
+
+                            if (response.ok) {
+                                const imageUrl = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${GITHUB_REPO}/main/${UPLOAD_PATH}/${uploadFileName}`;
+                                localStorage.setItem(IMAGE_URL_KEY, imageUrl);
+                                resolve(imageUrl);
+                            } else {
+                                let errorMsg = data.message || 'خطا در آپلود';
+                                if (response.status === 401) {
+                                    errorMsg = '❌ Token نامعتبر است';
+                                } else if (response.status === 404) {
+                                    errorMsg = '❌ پوشه uploads وجود ندارد';
+                                }
+                                reject(new Error(errorMsg));
+                            }
+                        } catch (error) {
+                            reject(new Error(error.message || 'خطا در ارتباط با GitHub'));
+                        }
+                    };
+
+                    reader.onerror = () => {
+                        reject(new Error('خطا در خواندن فایل'));
+                    };
+
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // =========================================
+            // مدیریت آپلود فایل
+            // =========================================
+            fileInput.addEventListener('change', async function(e) {
+                if (!isAdminMode) {
+                    showStatus('⚠️ ابتدا وارد حالت مدیریت شوید.', 'error');
+                    return;
+                }
+
+                if (isUploading) return;
+
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (!file.type.startsWith('image/')) {
+                    showStatus('❌ لطفاً فایل تصویری انتخاب کنید.', 'error');
+                    fileInput.value = '';
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    showStatus('❌ حجم فایل نباید بیشتر از ۵ مگابایت باشد.', 'error');
+                    fileInput.value = '';
+                    return;
+                }
+
+                isUploading = true;
+                uploadLabel.disabled = true;
+                deleteBtn.disabled = true;
+                progressBar.classList.add('active');
+                progressFill.style.width = '0%';
+                
+                showStatus('⏳ در حال آپلود عکس به GitHub...', 'loading');
+
+                try {
+                    progressFill.style.width = '30%';
+                    const newImageUrl = await uploadToGitHub(file);
+                    
+                    progressFill.style.width = '100%';
+                    
+                    showImage(newImageUrl, '✅ عکس با موفقیت آپلود شد!');
+                    showStatus('✅ عکس با موفقیت در GitHub ذخیره شد!', 'success');
+                    
+                } catch (error) {
+                    showStatus('❌ ' + error.message, 'error');
+                    console.error('Upload Error:', error);
+                } finally {
+                    isUploading = false;
+                    uploadLabel.disabled = false;
+                    deleteBtn.disabled = false;
+                    setTimeout(() => {
+                        progressBar.classList.remove('active');
+                        progressFill.style.width = '0%';
+                    }, 1000);
+                    fileInput.value = '';
+                }
             });
-        });
-    }
 
-    renderChart();
-    renderTable();
+            // =========================================
+            // حذف عکس (فقط از نمایشگر)
+            // =========================================
+            deleteBtn.addEventListener('click', function() {
+                if (!isAdminMode) {
+                    showStatus('⚠️ ابتدا وارد حالت مدیریت شوید.', 'error');
+                    return;
+                }
+                if (isUploading) return;
+                
+                if (confirm('آیا عکس این پروژه حذف شود؟')) {
+                    localStorage.removeItem(IMAGE_URL_KEY);
+                    loadImage();
+                    showStatus('🗑️ عکس از نمایشگر حذف شد.', 'success');
+                }
+            });
 
-    // Admin
-    const modal = document.getElementById('pwModal');
-    const pwInput = document.getElementById('pwInput');
-    const pwError = document.getElementById('pwError');
+            // =========================================
+            // مدیریت (رمز ورود)
+            // =========================================
+            function toggleAdmin() {
+                if (isUploading) return;
+                
+                if (!isAdminMode) {
+                    const password = prompt('🔑 لطفاً رمز مدیریت را وارد کنید:');
+                    if (password === ADMIN_PASSWORD) {
+                        isAdminMode = true;
+                        adminPanel.classList.add('visible');
+                        adminToggleBtn.textContent = '🔓 بستن مدیریت';
+                        adminToggleBtn.classList.add('active');
+                        showStatus('✅ وارد حالت مدیریت شدید.', 'success');
+                    } else if (password !== null) {
+                        showStatus('❌ رمز اشتباه است!', 'error');
+                    }
+                } else {
+                    isAdminMode = false;
+                    adminPanel.classList.remove('visible');
+                    adminToggleBtn.textContent = '🔒 مدیریت';
+                    adminToggleBtn.classList.remove('active');
+                    showStatus('🔒 از حالت مدیریت خارج شدید.', 'success');
+                }
+            }
 
-    document.getElementById('adminBtn').addEventListener('click',()=>{
-        if(!isAdmin){
-            modal.classList.remove('hidden');
-            modal.style.display='flex';
-            pwInput.value='';
-            pwError.classList.add('hidden');
-            pwInput.focus();
-        } else { exitAdmin(); }
-    });
-    document.getElementById('pwCancel').addEventListener('click',()=>{ modal.classList.add('hidden'); modal.style.display=''; });
-    document.getElementById('pwSubmit').addEventListener('click', tryLogin);
-    pwInput.addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+            adminToggleBtn.addEventListener('click', toggleAdmin);
 
-    function tryLogin(){
-        if(pwInput.value===PASSWORD){ modal.classList.add('hidden'); modal.style.display=''; enterAdmin(); }
-        else { pwError.classList.remove('hidden'); }
-    }
-    function enterAdmin(){
-        isAdmin=true;
-        document.getElementById('adminBar').classList.remove('hidden');
-        document.getElementById('adminBtnLabel').textContent='🔓 خروج';
-        renderEditTable();
-    }
-    function exitAdmin(){
-        isAdmin=false;
-        document.getElementById('adminBar').classList.add('hidden');
-        document.getElementById('adminBtnLabel').textContent='🔒 مدیریت';
-        renderTable();
-    }
-    document.getElementById('adminExit').addEventListener('click', exitAdmin);
+            previewContainer.addEventListener('click', function() {
+                if (isAdminMode && !isUploading) {
+                    fileInput.click();
+                }
+            });
 
-    lucide.createIcons();
-})();
-</script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a17d6b79711316db',t:'MTc4MzQ5NjIwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+            document.addEventListener('keydown', function(e) {
+                if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                    e.preventDefault();
+                    toggleAdmin();
+                }
+            });
+
+            document.getElementById('viewCount').addEventListener('dblclick', function() {
+                if (confirm('بازدیدهای این پروژه ریست شوند؟')) {
+                    localStorage.setItem(VIEW_KEY, '0');
+                    document.getElementById('viewCount').textContent = '0';
+                    showStatus('🔄 بازدیدها ریست شد.', 'success');
+                }
+            });
+
+            console.log('📊 پروژه:', projectName);
+            console.log('📁 نام فایل:', fileName || 'تعریف نشده');
+            console.log('🔗 لینک عکس:', imageUrl || 'ندارد');
+            console.log('📂 ریپازیتوری:', GITHUB_REPO);
+        })();
+
+        function copyPublicLink() {
+            const linkElement = document.getElementById('linkText');
+            const link = linkElement.innerText || linkElement.textContent;
+            if (link) {
+                navigator.clipboard.writeText(link).then(() => {
+                    alert('✅ لینک کپی شد!');
+                }).catch(() => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = link;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('✅ لینک کپی شد!');
+                });
+            }
+        }
+    </script>
+</body>
 </html>
