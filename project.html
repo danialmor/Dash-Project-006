@@ -352,11 +352,6 @@
             text-align: center;
         }
 
-        .info-box a {
-            color: #1a6e3a;
-            font-weight: 600;
-        }
-
         .image-status {
             margin-top: 8px;
             padding: 8px;
@@ -410,9 +405,7 @@
         <div class="admin-panel" id="adminPanel">
             <div class="upload-section">
                 <div class="info-box">
-                    📁 عکس‌ها در پوشه <strong>uploads/</strong> ریپازیتوری ذخیره می‌شوند
-                    <br />
-                    <span style="font-size:0.8rem;">نام فایل‌ها باید با نام پروژه مطابقت داشته باشد</span>
+                    📁 عکس‌ها در پوشه <strong>uploads/</strong> ریپازیتوری <strong>Dash-Project-006</strong> ذخیره می‌شوند
                 </div>
 
                 <label for="fileInput" class="upload-label" id="uploadLabel">📤 آپلود/جایگزینی عکس</label>
@@ -453,7 +446,7 @@
         (function() {
             const ADMIN_PASSWORD = '1405';
             const GITHUB_USERNAME = 'danialmor';
-            const GITHUB_REPO = 'upload-image';
+            const GITHUB_REPO = 'Dash-Project-006';  // ✅ اصلاح شد
             const UPLOAD_PATH = 'uploads';
 
             // =========================================
@@ -527,18 +520,14 @@
             // بارگذاری عکس
             // =========================================
             function loadImage() {
-                // اول بررسی کن ببینیم لینک در localStorage هست (آپلود شده)
                 const savedUrl = localStorage.getItem(IMAGE_URL_KEY);
                 
                 if (savedUrl && savedUrl.startsWith('http')) {
-                    // عکس آپلود شده توسط کاربر
                     showImage(savedUrl, '✅ عکس آپلود شده توسط شما');
                     return;
                 }
 
                 if (imageUrl) {
-                    // عکس از پوشه uploads
-                    // بررسی کنیم که عکس وجود دارد یا نه
                     fetch(imageUrl, { method: 'HEAD' })
                         .then(response => {
                             if (response.ok) {
@@ -586,7 +575,6 @@
                 imageStatus.textContent = statusText;
             }
 
-            // بارگذاری اولیه
             loadImage();
 
             // =========================================
@@ -799,6 +787,7 @@
             console.log('📊 پروژه:', projectName);
             console.log('📁 نام فایل:', fileName || 'تعریف نشده');
             console.log('🔗 لینک عکس:', imageUrl || 'ندارد');
+            console.log('📂 ریپازیتوری:', GITHUB_REPO);
         })();
 
         function copyPublicLink() {
