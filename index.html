@@ -131,9 +131,6 @@
             font-weight: 600;
         }
 
-        /* ========================================= */
-        /* 🏆 بخش رقابتی SPI */
-        /* ========================================= */
         .spi-competitive {
             background: rgba(255, 255, 255, 0.5);
             border-radius: 24px;
@@ -248,7 +245,7 @@
         .deviation-zero { color: #6b7280; }
 
         /* ========================================= */
-        /* 🛠️ پنل مدیریت (ویرایش داده‌ها) */
+        /* 🛠️ پنل مدیریت */
         /* ========================================= */
         .admin-panel {
             display: none;
@@ -334,10 +331,6 @@
             box-shadow: 0 0 0 3px rgba(26, 110, 58, 0.2);
         }
 
-        .admin-table .admin-input.spi-input { width: 70px; }
-        .admin-table .admin-input.progress-input { width: 60px; }
-        .admin-table .admin-input.deviation-input { width: 70px; }
-
         .admin-actions {
             display: flex;
             justify-content: center;
@@ -403,7 +396,32 @@
             color: #dc2626;
         }
 
-        /* ========================================= */
+        .admin-bar {
+            display: none;
+            margin-bottom: 16px;
+            padding: 12px 20px;
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: 600;
+            color: #92400e;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .admin-bar.show {
+            display: block;
+        }
+
+        .admin-bar .exit-btn {
+            color: #dc2626;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .admin-bar .exit-btn:hover {
+            color: #991b1b;
+        }
 
         .update-date-section {
             display: flex;
@@ -527,34 +545,6 @@
             opacity: 0.5;
         }
 
-        /* Admin Bar */
-        .admin-bar {
-            display: none;
-            margin-bottom: 16px;
-            padding: 12px 20px;
-            background: #fef3c7;
-            border: 2px solid #f59e0b;
-            border-radius: 16px;
-            text-align: center;
-            font-weight: 600;
-            color: #92400e;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .admin-bar.show {
-            display: block;
-        }
-
-        .admin-bar .exit-btn {
-            color: #dc2626;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        .admin-bar .exit-btn:hover {
-            color: #991b1b;
-        }
-
         @media (max-width: 600px) {
             .main-title { font-size: 1.8rem; }
             .card { padding: 20px 14px; }
@@ -571,9 +561,6 @@
             .progress-bar-cell .bar-bg { width: 40px; }
             .admin-table thead th, .admin-table tbody td { padding: 6px 4px; font-size: 0.75rem; }
             .admin-table .admin-input { width: 50px; font-size: 0.75rem; }
-            .admin-table .admin-input.spi-input { width: 55px; }
-            .admin-table .admin-input.progress-input { width: 45px; }
-            .admin-table .admin-input.deviation-input { width: 55px; }
         }
     </style>
 </head>
@@ -599,9 +586,6 @@
             کنترل ثبت گزارش‌ها و هماهنگی بین <strong>دفتر فنی، کارگاه و واحد مالی</strong> طراحی شده است.
         </div>
 
-        <!-- ========================================= -->
-        <!-- 🏆 جدول رقابتی SPI -->
-        <!-- ========================================= -->
         <div class="spi-competitive">
             <h2>🏆 رقابت عملکرد پروژه‌ها</h2>
             <p class="subtitle">SPI &gt; 1 = جلوتر از برنامه · SPI = 1 = طبق برنامه · SPI &lt; 1 = عقب‌تر</p>
@@ -618,17 +602,13 @@
                         </tr>
                     </thead>
                     <tbody id="spiTableBody">
-                        <!-- توسط جاوااسکریپت پر می‌شود -->
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ========================================= -->
-        <!-- 🛠️ پنل مدیریت (ویرایش داده‌ها) -->
-        <!-- ========================================= -->
         <div class="admin-bar" id="adminBar">
-            ✏️ <strong>حالت مدیریت فعال</strong> — می‌توانید داده‌های SPI، پیشرفت و انحراف را ویرایش کنید
+            ✏️ <strong>حالت مدیریت فعال</strong> — می‌توانید داده‌ها را ویرایش کنید
             · <span class="exit-btn" id="adminExit">خروج</span>
         </div>
 
@@ -647,7 +627,6 @@
                         </tr>
                     </thead>
                     <tbody id="adminTableBody">
-                        <!-- توسط جاوااسکریپت پر می‌شود -->
                     </tbody>
                 </table>
             </div>
@@ -660,8 +639,6 @@
 
             <div class="admin-status" id="adminStatus"></div>
         </div>
-
-        <!-- ========================================= -->
 
         <div class="update-date-section">
             <label>📌 آخرین آپدیت نمودارها:</label>
@@ -693,7 +670,7 @@
             const ADMIN_PASSWORD = '1405';
 
             // =========================================
-            // 📊 داده‌های پیش‌فرض پروژه‌ها
+            // 📊 داده‌های پیش‌فرض (همینجا در کد)
             // =========================================
             const DEFAULT_PROJECTS = [
                 { name: 'حمزه', spi: 1.15, progress: 78, deviation: -5 },
@@ -708,25 +685,15 @@
             ];
 
             const DATA_KEY = 'dashboard_spi_data';
-            let isAdminMode = false;
 
             // =========================================
-            // 📥 دریافت داده‌ها
+            // 📥 دریافت داده‌ها (از localStorage یا پیش‌فرض)
             // =========================================
             function getProjectData() {
                 const saved = localStorage.getItem(DATA_KEY);
                 if (saved) {
                     try {
                         const parsed = JSON.parse(saved);
-                        // اطمینان از کامل بودن داده‌ها
-                        const allNames = DEFAULT_PROJECTS.map(p => p.name);
-                        const existingNames = parsed.map(p => p.name);
-                        allNames.forEach(name => {
-                            if (!existingNames.includes(name)) {
-                                const defaultItem = DEFAULT_PROJECTS.find(d => d.name === name);
-                                if (defaultItem) parsed.push({ ...defaultItem });
-                            }
-                        });
                         return parsed;
                     } catch (e) {
                         return DEFAULT_PROJECTS;
@@ -740,7 +707,19 @@
             }
 
             // =========================================
-            // 🏆 رندر جدول رقابتی SPI
+            // 🔄 ریست به پیش‌فرض
+            // =========================================
+            function resetToDefault() {
+                if (confirm('آیا مطمئن هستید؟ همه تغییرات شما از بین خواهد رفت.')) {
+                    saveProjectData(DEFAULT_PROJECTS);
+                    renderSpiTable();
+                    renderAdminTable();
+                    showAdminStatus('🔄 داده‌ها به حالت پیش‌فرض بازگشتند.', 'success');
+                }
+            }
+
+            // =========================================
+            // 🏆 رندر جدول اصلی
             // =========================================
             function renderSpiTable() {
                 const data = getProjectData();
@@ -794,7 +773,7 @@
             }
 
             // =========================================
-            // 🛠️ رندر جدول ویرایش مدیریت
+            // 🛠️ رندر جدول مدیریت
             // =========================================
             function renderAdminTable() {
                 const data = getProjectData();
@@ -805,16 +784,16 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td style="text-align:right;font-weight:600;">${p.name}</td>
-                        <td><input type="number" step="0.01" value="${p.spi}" data-idx="${index}" data-field="spi" class="admin-input spi-input" /></td>
-                        <td><input type="number" step="1" min="0" max="100" value="${p.progress}" data-idx="${index}" data-field="progress" class="admin-input progress-input" /></td>
-                        <td><input type="number" step="1" value="${p.deviation}" data-idx="${index}" data-field="deviation" class="admin-input deviation-input" /></td>
+                        <td><input type="number" step="0.01" value="${p.spi}" data-idx="${index}" data-field="spi" class="admin-input" /></td>
+                        <td><input type="number" step="1" min="0" max="100" value="${p.progress}" data-idx="${index}" data-field="progress" class="admin-input" /></td>
+                        <td><input type="number" step="1" value="${p.deviation}" data-idx="${index}" data-field="deviation" class="admin-input" /></td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
             // =========================================
-            // 📤 ذخیره تغییرات از جدول مدیریت
+            // 💾 ذخیره تغییرات
             // =========================================
             function saveAdminChanges() {
                 const inputs = document.querySelectorAll('#adminTableBody .admin-input');
@@ -829,7 +808,7 @@
                     }
                 });
 
-                // محدودیت پیشرفت بین 0 تا 100
+                // محدودیت پیشرفت
                 data.forEach(p => {
                     if (p.progress < 0) p.progress = 0;
                     if (p.progress > 100) p.progress = 100;
@@ -841,19 +820,7 @@
             }
 
             // =========================================
-            // 🔄 بازگشت به داده‌های پیش‌فرض
-            // =========================================
-            function resetToDefault() {
-                if (confirm('آیا مطمئن هستید؟ همه تغییرات شما از بین خواهد رفت.')) {
-                    saveProjectData(DEFAULT_PROJECTS);
-                    renderSpiTable();
-                    renderAdminTable();
-                    showAdminStatus('🔄 داده‌ها به حالت پیش‌فرض بازگشتند.', 'success');
-                }
-            }
-
-            // =========================================
-            // 📊 نمایش وضعیت در پنل مدیریت
+            // 📊 نمایش وضعیت
             // =========================================
             function showAdminStatus(msg, type = 'success') {
                 const status = document.getElementById('adminStatus');
@@ -870,8 +837,10 @@
             }
 
             // =========================================
-            // 🔓 مدیریت (رمز ورود)
+            // 🔓 مدیریت رمز
             // =========================================
+            let isAdminMode = false;
+
             function toggleAdmin() {
                 if (!isAdminMode) {
                     const password = prompt('🔑 لطفاً رمز مدیریت را وارد کنید:');
@@ -901,7 +870,7 @@
             }
 
             // =========================================
-            // 1. تاریخ‌ها
+            // 📅 تاریخ
             // =========================================
             function toPersianDate(date) {
                 const persian = new Intl.DateTimeFormat('fa-IR', {
@@ -931,7 +900,7 @@
             document.getElementById('weekday').textContent = getWeekday(now);
 
             // =========================================
-            // 2. تاریخ آپدیت
+            // 📌 تاریخ آپدیت
             // =========================================
             const UPDATE_KEY = 'mainUpdateDate';
             const updateInput = document.getElementById('updateDateInput');
@@ -956,7 +925,7 @@
             });
 
             // =========================================
-            // 3. نمایش ✅ برای پروژه‌هایی که عکس دارند
+            // ✅ عکس‌ها
             // =========================================
             document.querySelectorAll('.project-link').forEach(link => {
                 const pName = link.dataset.project;
@@ -967,7 +936,7 @@
             });
 
             // =========================================
-            // 4. رویدادهای دکمه‌ها
+            // 🎯 رویدادها
             // =========================================
             document.getElementById('adminToggleBtn').addEventListener('click', toggleAdmin);
             document.getElementById('adminExit').addEventListener('click', exitAdmin);
@@ -975,7 +944,6 @@
             document.getElementById('saveDataBtn').addEventListener('click', saveAdminChanges);
             document.getElementById('resetDataBtn').addEventListener('click', resetToDefault);
 
-            // کلید میانبر M
             document.addEventListener('keydown', function(e) {
                 if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.altKey && !e.metaKey) {
                     e.preventDefault();
@@ -984,14 +952,14 @@
             });
 
             // =========================================
-            // 🚀 بارگذاری اولیه
+            // 🚀 بارگذاری
             // =========================================
             renderSpiTable();
 
             console.log('📊 مدیریت متمرکز پروژه‌ها - نسخه ۳.۰');
-            console.log('🔑 رمز مدیریت:', ADMIN_PASSWORD);
-            console.log('🏆 جدول رقابتی SPI فعال شد');
-            console.log('🛠️ برای ویرایش داده‌ها، روی دکمه مدیریت کلیک کنید');
+            console.log('🔑 رمز مدیریت: 1405');
+            console.log('💡 تغییرات در localStorage ذخیره می‌شوند');
+            console.log('📌 برای اشتراک‌گذاری، فایل index.html را در GitHub آپلود کنید');
         })();
     </script>
 </body>
