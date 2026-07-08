@@ -1,248 +1,387 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
- <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260708-05-579f504"}');</script><script src="/_sdk/f432b76fb310b513.telemetry_sdk.js" integrity="sha512-9FJQ55EKmmqhyyik8BhrMVfm0+iYYfb8uOlRsjtkxJMEI97qOVEI4PnHohDjQAtvAep0IOEpdQ64eki0sz62ug=="></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>داشبورد مدیریت پروژه‌ها</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <style>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>داشبورد مدیریت پروژه‌ها</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <style>
         body { font-family: 'DM Sans', 'Tahoma', sans-serif; }
         .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); }
         .bar-fill { transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
         .hero-overlay { background: linear-gradient(180deg, rgba(11,42,59,0.75) 0%, rgba(11,42,59,0.25) 100%); }
         .fade-in { animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+        .project-link {
+            transition: all 0.2s ease;
+        }
+        .project-link:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(0, 20, 30, 0.15);
+        }
+        .project-link .spi-badge {
+            font-size: 0.7rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .spi-good { background: #d1fae5; color: #065f46; }
+        .spi-warning { background: #fef3c7; color: #92400e; }
+        .spi-danger { background: #fee2e2; color: #991b1b; }
     </style>
-  <script src="/_sdk/0179d719c431a79e.data_sdk.js" type="text/javascript" integrity="sha512-OsRvJkI5GkC3MJQcgotQYotpzrMSX415GiKKgvYdxQEEkzD/fdchShO2FMSy0PJr/tiINMXOk5Vl2zAgg6bUiA=="></script>
-  <script src="/_sdk/9432170dbd2ae0df.resizing_sdk.js" type="text/javascript" integrity="sha512-FeT+58sb1f9ejWPWFjCbJvTT+SDwGV+ngrHUnlO7TWEOoqwOLj6p256kO3vOL7DIWl1cIgrobiof8v2bOigwPg=="></script>
- </head>
- <body data-template-id="__page-root" class="min-h-screen"><!-- Password Modal -->
-  <div id="pwModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.5)">
-   <div class="bg-white rounded-3xl p-8 w-80 text-center shadow-2xl">
-    <h3 class="text-lg font-bold text-gray-800 mb-4">🔑 رمز مدیریت</h3><input id="pwInput" type="password" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-lg mb-3 focus:outline-none focus:border-emerald-500" placeholder="رمز را وارد کنید">
-    <p id="pwError" class="text-red-500 text-sm mb-3 hidden">❌ رمز اشتباه است</p>
-    <div class="flex gap-3"><button id="pwSubmit" class="flex-1 bg-emerald-600 text-white rounded-xl py-2 font-bold hover:bg-emerald-700">ورود</button> <button id="pwCancel" class="flex-1 bg-gray-200 text-gray-700 rounded-xl py-2 font-bold hover:bg-gray-300">انصراف</button>
+</head>
+<body class="min-h-screen">
+
+    <!-- Password Modal -->
+    <div id="pwModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.5)">
+        <div class="bg-white rounded-3xl p-8 w-80 text-center shadow-2xl">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">🔑 رمز مدیریت</h3>
+            <input id="pwInput" type="password" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-lg mb-3 focus:outline-none focus:border-emerald-500" placeholder="رمز را وارد کنید" />
+            <p id="pwError" class="text-red-500 text-sm mb-3 hidden">❌ رمز اشتباه است</p>
+            <div class="flex gap-3">
+                <button id="pwSubmit" class="flex-1 bg-emerald-600 text-white rounded-xl py-2 font-bold hover:bg-emerald-700">ورود</button>
+                <button id="pwCancel" class="flex-1 bg-gray-200 text-gray-700 rounded-xl py-2 font-bold hover:bg-gray-300">انصراف</button>
+            </div>
+        </div>
     </div>
-   </div>
-  </div>
-  <div class="max-w-6xl mx-auto p-4 md:p-6 w-full"><!-- Hero -->
-   <header class="relative rounded-[2rem] overflow-hidden mb-6 shadow-xl"><img data-template-id="hero-bg" class="canva-image w-full h-48 md:h-64 object-cover" loading="lazy">
-    <div class="hero-overlay absolute inset-0 flex flex-col items-center justify-center p-6">
-     <h1 data-template-id="main-title" class="canva-text text-white text-center font-bold drop-shadow-lg"></h1>
-     <p data-template-id="main-subtitle" class="canva-text text-white/80 text-center mt-2"></p>
-    </div><button id="adminBtn" class="absolute top-4 left-4 bg-white/20 backdrop-blur text-white border border-white/40 px-4 py-2 rounded-full text-sm font-semibold hover:bg-white/30 transition"> <span id="adminBtnLabel">🔒 مدیریت</span> </button>
-   </header><!-- Admin Bar -->
-   <div id="adminBar" class="hidden mb-4 p-3 bg-amber-50 border-2 border-dashed border-amber-400 rounded-2xl text-center text-sm text-amber-800 font-semibold fade-in">
-    ✏️ حالت ویرایش فعال — داده‌های جدول و نمودار قابل ویرایش هستند · <button id="adminExit" class="underline hover:text-red-600">خروج</button>
-   </div><!-- Date -->
-   <section data-template-id="date-section" class="canva-section glass rounded-full px-6 py-3 flex flex-wrap justify-center gap-4 md:gap-8 mb-6 shadow-sm border border-white/60"><span class="text-sm font-medium text-slate-700">📅 شمسی: <strong id="shamsiDate" class="text-emerald-700"></strong></span> <span class="text-sm font-medium text-slate-700">🌍 میلادی: <strong id="miladiDate" class="text-blue-700"></strong></span> <span class="text-sm font-medium text-slate-700">📆 <span id="weekday"></span></span>
-   </section><!-- Announcements -->
-   <section data-template-id="announce-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
-    <h2 data-template-id="announce-heading" class="canva-text font-bold mb-3"></h2>
-    <ul id="announceList" class="space-y-2 text-sm text-slate-700 leading-7">
-     <li data-template-id="announce-1" class="canva-text flex items-start gap-2"></li>
-     <li data-template-id="announce-2" class="canva-text flex items-start gap-2"></li>
-     <li data-template-id="announce-3" class="canva-text flex items-start gap-2"></li>
-    </ul>
-   </section><!-- Weekly Meetings -->
-   <section data-template-id="meetings-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
-    <h2 data-template-id="meetings-heading" class="canva-text font-bold mb-3"></h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-     <div data-template-id="meeting-1" class="canva-card rounded-2xl p-3 text-center">
-      <p data-template-id="meeting-1-text" class="canva-text text-sm font-semibold"></p>
-     </div>
-     <div data-template-id="meeting-2" class="canva-card rounded-2xl p-3 text-center">
-      <p data-template-id="meeting-2-text" class="canva-text text-sm font-semibold"></p>
-     </div>
-     <div data-template-id="meeting-3" class="canva-card rounded-2xl p-3 text-center">
-      <p data-template-id="meeting-3-text" class="canva-text text-sm font-semibold"></p>
-     </div>
-    </div>
-   </section><!-- SPI Chart -->
-   <section data-template-id="chart-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
-    <h2 data-template-id="chart-heading" class="canva-text font-bold mb-4"></h2>
-    <div id="spiChart" class="space-y-3"></div>
-    <p class="text-xs text-slate-500 mt-3 text-center">SPI &gt; 1 = جلوتر از برنامه · SPI = 1 = طبق برنامه · SPI &lt; 1 = عقب‌تر</p>
-   </section><!-- Comparison Table -->
-   <section data-template-id="table-section" class="canva-card rounded-3xl p-5 mb-6 shadow-sm border border-white/60 overflow-x-auto">
-    <h2 data-template-id="table-heading" class="canva-text font-bold mb-4"></h2>
-    <table class="w-full text-sm">
-     <thead>
-      <tr class="border-b border-slate-200">
-       <th class="py-2 px-3 text-right font-bold text-slate-700">پروژه</th>
-       <th class="py-2 px-3 text-center font-bold text-slate-700">SPI</th>
-       <th class="py-2 px-3 text-center font-bold text-slate-700">پیشرفت %</th>
-       <th class="py-2 px-3 text-center font-bold text-slate-700">انحراف (روز)</th>
-      </tr>
-     </thead>
-     <tbody id="compTable"></tbody>
-    </table>
-   </section><!-- Tips -->
-   <section data-template-id="tips-section" class="canva-card rounded-3xl p-5 mb-6 border-r-4 shadow-sm">
-    <h2 data-template-id="tips-heading" class="canva-text font-bold mb-3"></h2>
-    <ul class="space-y-2 text-sm leading-7 text-slate-700">
-     <li data-template-id="tip-1" class="canva-text"></li>
-     <li data-template-id="tip-2" class="canva-text"></li>
-     <li data-template-id="tip-3" class="canva-text"></li>
-     <li data-template-id="tip-4" class="canva-text"></li>
-     <li data-template-id="tip-5" class="canva-text"></li>
-    </ul>
-   </section><!-- Project Links -->
-   <section class="mb-6">
-    <h2 data-template-id="projects-heading" class="canva-text text-center font-bold mb-4"></h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"><a data-template-id="proj-1" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-2" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-3" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-4" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-5" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-6" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-7" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-8" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a> <a data-template-id="proj-9" class="canva-button glass rounded-2xl py-4 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg hover:-translate-y-1 transition-all no-underline block"></a>
-    </div>
-   </section>
-   <footer class="text-center border-t border-gray-200 pt-4">
-    <p data-template-id="footer-text" class="canva-text text-xs opacity-50"></p>
-   </footer>
-  </div>
-  <script src="/_sdk/719055fef2a85d14.editing_sdk.js" integrity="sha512-kFqrdGgIiTOsu307feB5Cy3JVP9IayftsmCIZ0csxYBGuBmJQPhyvcnmKR8F0fTW97h5s1gAvz3SumI8zJ6OxQ=="></script>
-  <script>
-(function(){
-    const PASSWORD = '1405';
-    let isAdmin = false;
 
-    // Projects data (stored in localStorage)
-    const PROJECTS = ['حمزه','بلوار مهر','بهار آزادی','ملاصدرا','جابرانصاری','آب۲۵۰','فارابی','سجاد','توحید'];
-    const DATA_KEY = 'dashboard_project_data';
-
-    function getProjectData(){
-        const saved = localStorage.getItem(DATA_KEY);
-        if(saved) return JSON.parse(saved);
-        return PROJECTS.map(name=>({name, spi:1.0, progress:0, deviation:0}));
-    }
-    function saveProjectData(data){ localStorage.setItem(DATA_KEY, JSON.stringify(data)); }
-
-    // Date
-    const now = new Date();
-    const shamsi = new Intl.DateTimeFormat('fa-IR',{year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
-    const weekdays = ['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
-    document.getElementById('shamsiDate').textContent = shamsi;
-    document.getElementById('miladiDate').textContent = now.toLocaleDateString('en-US',{year:'numeric',month:'2-digit',day:'2-digit'});
-    document.getElementById('weekday').textContent = weekdays[now.getDay()];
-
-    // Render chart
-    function renderChart(){
-        const data = getProjectData();
-        const maxSpi = Math.max(...data.map(d=>d.spi), 1.2);
-        const chart = document.getElementById('spiChart');
-        chart.innerHTML = '';
-        data.forEach(p=>{
-            const pct = Math.min((p.spi / maxSpi) * 100, 100);
-            const color = p.spi >= 1 ? '#059669' : p.spi >= 0.8 ? '#d97706' : '#dc2626';
-            const row = document.createElement('div');
-            row.className = 'flex items-center gap-3';
-            row.innerHTML = `
-                <span class="w-24 text-xs font-semibold text-slate-700 text-left shrink-0">${p.name}</span>
-                <div class="flex-1 h-7 bg-slate-100 rounded-full overflow-hidden relative">
-                    <div class="bar-fill h-full rounded-full" style="width:${pct}%;background:${color}"></div>
-                    <span class="absolute inset-0 flex items-center justify-center text-xs font-bold" style="color:${pct>40?'#fff':'#333'}">${p.spi.toFixed(2)}</span>
+    <div class="max-w-6xl mx-auto p-4 md:p-6 w-full">
+        
+        <!-- Hero -->
+        <header class="relative rounded-[2rem] overflow-hidden mb-6 shadow-xl">
+            <div class="bg-gradient-to-r from-emerald-700 to-teal-600 w-full h-48 md:h-56 flex items-center justify-center">
+                <div class="text-center text-white p-6">
+                    <h1 class="text-3xl md:text-4xl font-bold drop-shadow-lg">📊 داشبورد مدیریت پروژه‌ها</h1>
+                    <p class="text-white/80 text-base md:text-lg mt-2">پایش سریع وضعیت عملیات اجرایی</p>
                 </div>
-            `;
-            chart.appendChild(row);
-        });
-    }
+            </div>
+            <button id="adminBtn" class="absolute top-4 left-4 bg-white/20 backdrop-blur text-white border border-white/40 px-4 py-2 rounded-full text-sm font-semibold hover:bg-white/30 transition">
+                <span id="adminBtnLabel">🔒 مدیریت</span>
+            </button>
+        </header>
 
-    // Render table
-    function renderTable(){
-        const data = getProjectData();
-        const tbody = document.getElementById('compTable');
-        tbody.innerHTML = '';
-        // Sort by progress desc
-        const sorted = [...data].sort((a,b)=>b.progress - a.progress);
-        sorted.forEach((p,i)=>{
-            const devColor = p.deviation > 0 ? '#dc2626' : p.deviation < 0 ? '#059669' : '#6b7280';
-            const devText = p.deviation > 0 ? `+${p.deviation} روز تأخیر` : p.deviation < 0 ? `${p.deviation} روز جلوتر` : 'طبق برنامه';
-            const tr = document.createElement('tr');
-            tr.className = 'border-b border-slate-100 hover:bg-slate-50 transition';
-            tr.innerHTML = `
-                <td class="py-3 px-3 font-semibold text-slate-800">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'  '} ${p.name}</td>
-                <td class="py-3 px-3 text-center font-bold" style="color:${p.spi>=1?'#059669':'#dc2626'}">${p.spi.toFixed(2)}</td>
-                <td class="py-3 px-3 text-center">
-                    <div class="inline-flex items-center gap-2">
-                        <div class="w-20 h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full rounded-full bg-emerald-500" style="width:${p.progress}%"></div></div>
-                        <span class="font-bold text-slate-700">${p.progress}%</span>
-                    </div>
-                </td>
-                <td class="py-3 px-3 text-center font-semibold" style="color:${devColor}">${devText}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
+        <!-- Admin Bar -->
+        <div id="adminBar" class="hidden mb-4 p-3 bg-amber-50 border-2 border-dashed border-amber-400 rounded-2xl text-center text-sm text-amber-800 font-semibold fade-in">
+            ✏️ حالت ویرایش فعال — داده‌های جدول و نمودار قابل ویرایش هستند · <button id="adminExit" class="underline hover:text-red-600">خروج</button>
+        </div>
 
-    // Admin edit table
-    function renderEditTable(){
-        const data = getProjectData();
-        const tbody = document.getElementById('compTable');
-        tbody.innerHTML = '';
-        data.forEach((p,i)=>{
-            const tr = document.createElement('tr');
-            tr.className = 'border-b border-slate-100';
-            tr.innerHTML = `
-                <td class="py-2 px-3 font-semibold text-slate-800">${p.name}</td>
-                <td class="py-2 px-3 text-center"><input type="number" step="0.01" value="${p.spi}" data-idx="${i}" data-field="spi" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
-                <td class="py-2 px-3 text-center"><input type="number" step="1" min="0" max="100" value="${p.progress}" data-idx="${i}" data-field="progress" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
-                <td class="py-2 px-3 text-center"><input type="number" step="1" value="${p.deviation}" data-idx="${i}" data-field="deviation" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
-            `;
-            tbody.appendChild(tr);
-        });
-        // Save on change
-        tbody.querySelectorAll('.admin-input').forEach(input=>{
-            input.addEventListener('change', ()=>{
-                const d = getProjectData();
-                const idx = parseInt(input.dataset.idx);
-                const field = input.dataset.field;
-                d[idx][field] = parseFloat(input.value) || 0;
-                saveProjectData(d);
-                renderChart();
+        <!-- Date -->
+        <section class="glass rounded-full px-6 py-3 flex flex-wrap justify-center gap-4 md:gap-8 mb-6 shadow-sm border border-white/60">
+            <span class="text-sm font-medium text-slate-700">📅 شمسی: <strong id="shamsiDate" class="text-emerald-700"></strong></span>
+            <span class="text-sm font-medium text-slate-700">🌍 میلادی: <strong id="miladiDate" class="text-blue-700"></strong></span>
+            <span class="text-sm font-medium text-slate-700">📆 <span id="weekday"></span></span>
+        </section>
+
+        <!-- Announcements -->
+        <section class="glass rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
+            <h2 class="text-lg font-bold text-slate-800 mb-3">📋 مدیریت متمرکز پروژه‌های فعال</h2>
+            <ul class="space-y-2 text-sm text-slate-700 leading-7">
+                <li class="flex items-start gap-2">✅ گزارش‌های روزانه، تأخیرات و تصمیم‌های کلیدی</li>
+                <li class="flex items-start gap-2">📌 پایش سریع وضعیت عملیات اجرایی و شناسایی ریسک‌های زمانی</li>
+                <li class="flex items-start gap-2">🔄 کنترل ثبت گزارش‌ها و هماهنگی بین دفتر فنی، کارگاه و واحد مالی</li>
+            </ul>
+        </section>
+
+        <!-- SPI Chart -->
+        <section class="glass rounded-3xl p-5 mb-6 shadow-sm border border-white/60">
+            <h2 class="text-lg font-bold text-slate-800 mb-4">📈 شاخص عملکرد پروژه (SPI)</h2>
+            <div id="spiChart" class="space-y-3"></div>
+            <p class="text-xs text-slate-500 mt-3 text-center">SPI &gt; 1 = جلوتر از برنامه · SPI = 1 = طبق برنامه · SPI &lt; 1 = عقب‌تر</p>
+        </section>
+
+        <!-- Comparison Table -->
+        <section class="glass rounded-3xl p-5 mb-6 shadow-sm border border-white/60 overflow-x-auto">
+            <h2 class="text-lg font-bold text-slate-800 mb-4">📊 مقایسه عملکرد پروژه‌ها</h2>
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-slate-200">
+                        <th class="py-2 px-3 text-right font-bold text-slate-700">پروژه</th>
+                        <th class="py-2 px-3 text-center font-bold text-slate-700">SPI</th>
+                        <th class="py-2 px-3 text-center font-bold text-slate-700">پیشرفت %</th>
+                        <th class="py-2 px-3 text-center font-bold text-slate-700">انحراف (روز)</th>
+                    </tr>
+                </thead>
+                <tbody id="compTable"></tbody>
+            </table>
+        </section>
+
+        <!-- Tips -->
+        <section class="glass rounded-3xl p-5 mb-6 border-r-4 border-emerald-500 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-800 mb-3">💡 توصیه‌های مدیریتی</h2>
+            <ul class="space-y-2 text-sm leading-7 text-slate-700">
+                <li>🔹 پروژه‌های با SPI کمتر از 0.8 نیاز به اقدام فوری دارند</li>
+                <li>🔹 جلسات هفتگی با تیم‌های عقب‌افتاده برگزار شود</li>
+                <li>🔹 منابع را به پروژه‌های بحرانی تخصیص دهید</li>
+                <li>🔹 گزارش‌های روزانه انحرافات را ثبت کنید</li>
+                <li>🔹 وضعیت تأمین مصالح و نیروی انسانی را پایش کنید</li>
+            </ul>
+        </section>
+
+        <!-- Project Links (با نمایش SPI) -->
+        <section class="mb-6">
+            <h2 class="text-center text-lg font-bold text-slate-800 mb-4">🔗 ورود به صفحه پروژه‌ها</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" id="projectLinks">
+                <!-- لینک‌ها توسط جاوااسکریپت ساخته می‌شوند -->
+            </div>
+        </section>
+
+        <footer class="text-center border-t border-gray-200 pt-4">
+            <p class="text-xs text-slate-400">✨ طراحی شده برای مدیریت پروژه‌های عمرانی · v2.0</p>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            const PASSWORD = '1405';
+            let isAdmin = false;
+
+            // =========================================
+            // لیست پروژه‌ها (با لینک به project.html)
+            // =========================================
+            const PROJECTS = ['حمزه', 'بلوار مهر', 'بهار آزادی', 'ملاصدرا', 'جابرانصاری', 'آب۲۵۰', 'فارابی', 'سجاد', 'توحید'];
+            const DATA_KEY = 'dashboard_project_data';
+
+            // =========================================
+            // داده‌های پیش‌فرض (SPI)
+            // =========================================
+            function getDefaultData() {
+                return [
+                    { name: 'حمزه', spi: 1.15, progress: 78, deviation: -5 },
+                    { name: 'بلوار مهر', spi: 0.92, progress: 45, deviation: 8 },
+                    { name: 'بهار آزادی', spi: 1.05, progress: 62, deviation: -3 },
+                    { name: 'ملاصدرا', spi: 0.75, progress: 30, deviation: 18 },
+                    { name: 'جابرانصاری', spi: 0.88, progress: 40, deviation: 12 },
+                    { name: 'آب۲۵۰', spi: 0.95, progress: 52, deviation: 6 },
+                    { name: 'فارابی', spi: 1.20, progress: 85, deviation: -8 },
+                    { name: 'سجاد', spi: 0.60, progress: 20, deviation: 25 },
+                    { name: 'توحید', spi: 1.10, progress: 70, deviation: -4 }
+                ];
+            }
+
+            function getProjectData() {
+                const saved = localStorage.getItem(DATA_KEY);
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        // اطمینان از اینکه همه پروژه‌ها وجود دارند
+                        const allNames = PROJECTS;
+                        const existingNames = parsed.map(p => p.name);
+                        allNames.forEach(name => {
+                            if (!existingNames.includes(name)) {
+                                const defaultData = getDefaultData();
+                                const defaultItem = defaultData.find(d => d.name === name);
+                                parsed.push(defaultItem || { name, spi: 1.0, progress: 0, deviation: 0 });
+                            }
+                        });
+                        return parsed;
+                    } catch (e) {
+                        return getDefaultData();
+                    }
+                }
+                return getDefaultData();
+            }
+
+            function saveProjectData(data) {
+                localStorage.setItem(DATA_KEY, JSON.stringify(data));
+            }
+
+            // =========================================
+            // تاریخ
+            // =========================================
+            const now = new Date();
+            const shamsi = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+            const weekdays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
+            document.getElementById('shamsiDate').textContent = shamsi;
+            document.getElementById('miladiDate').textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            document.getElementById('weekday').textContent = weekdays[now.getDay()];
+
+            // =========================================
+            // رندر نمودار SPI
+            // =========================================
+            function renderChart() {
+                const data = getProjectData();
+                const maxSpi = Math.max(...data.map(d => d.spi), 1.2);
+                const chart = document.getElementById('spiChart');
+                chart.innerHTML = '';
+                data.forEach(p => {
+                    const pct = Math.min((p.spi / maxSpi) * 100, 100);
+                    const color = p.spi >= 1 ? '#059669' : p.spi >= 0.8 ? '#d97706' : '#dc2626';
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center gap-3';
+                    row.innerHTML = `
+                        <span class="w-24 text-xs font-semibold text-slate-700 text-left shrink-0">${p.name}</span>
+                        <div class="flex-1 h-7 bg-slate-100 rounded-full overflow-hidden relative">
+                            <div class="bar-fill h-full rounded-full" style="width:${pct}%;background:${color}"></div>
+                            <span class="absolute inset-0 flex items-center justify-center text-xs font-bold" style="color:${pct>40?'#fff':'#333'}">${p.spi.toFixed(2)}</span>
+                        </div>
+                    `;
+                    chart.appendChild(row);
+                });
+            }
+
+            // =========================================
+            // رندر جدول مقایسه
+            // =========================================
+            function renderTable() {
+                const data = getProjectData();
+                const tbody = document.getElementById('compTable');
+                tbody.innerHTML = '';
+                const sorted = [...data].sort((a, b) => b.progress - a.progress);
+                sorted.forEach((p, i) => {
+                    const devColor = p.deviation > 0 ? '#dc2626' : p.deviation < 0 ? '#059669' : '#6b7280';
+                    const devText = p.deviation > 0 ? `+${p.deviation} روز تأخیر` : p.deviation < 0 ? `${Math.abs(p.deviation)} روز جلوتر` : 'طبق برنامه';
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-slate-100 hover:bg-slate-50 transition';
+                    tr.innerHTML = `
+                        <td class="py-3 px-3 font-semibold text-slate-800">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'  '} ${p.name}</td>
+                        <td class="py-3 px-3 text-center font-bold" style="color:${p.spi>=1?'#059669':'#dc2626'}">${p.spi.toFixed(2)}</td>
+                        <td class="py-3 px-3 text-center">
+                            <div class="inline-flex items-center gap-2">
+                                <div class="w-20 h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full rounded-full bg-emerald-500" style="width:${p.progress}%"></div></div>
+                                <span class="font-bold text-slate-700">${p.progress}%</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-3 text-center font-semibold" style="color:${devColor}">${devText}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // =========================================
+            // رندر جدول در حالت ویرایش
+            // =========================================
+            function renderEditTable() {
+                const data = getProjectData();
+                const tbody = document.getElementById('compTable');
+                tbody.innerHTML = '';
+                data.forEach((p, i) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-slate-100';
+                    tr.innerHTML = `
+                        <td class="py-2 px-3 font-semibold text-slate-800">${p.name}</td>
+                        <td class="py-2 px-3 text-center"><input type="number" step="0.01" value="${p.spi}" data-idx="${i}" data-field="spi" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
+                        <td class="py-2 px-3 text-center"><input type="number" step="1" min="0" max="100" value="${p.progress}" data-idx="${i}" data-field="progress" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
+                        <td class="py-2 px-3 text-center"><input type="number" step="1" value="${p.deviation}" data-idx="${i}" data-field="deviation" class="admin-input w-16 text-center border border-slate-300 rounded-lg py-1 text-sm"></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                tbody.querySelectorAll('.admin-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const d = getProjectData();
+                        const idx = parseInt(this.dataset.idx);
+                        const field = this.dataset.field;
+                        const val = parseFloat(this.value);
+                        if (!isNaN(val)) {
+                            d[idx][field] = val;
+                            saveProjectData(d);
+                            renderChart();
+                            renderProjectLinks();
+                        }
+                    });
+                });
+            }
+
+            // =========================================
+            // رندر لینک‌های پروژه‌ها (با SPI)
+            // =========================================
+            function renderProjectLinks() {
+                const data = getProjectData();
+                const container = document.getElementById('projectLinks');
+                container.innerHTML = '';
+                
+                data.forEach(p => {
+                    const link = document.createElement('a');
+                    link.href = `project.html?name=${encodeURIComponent(p.name)}`;
+                    link.className = 'project-link glass rounded-2xl py-4 px-2 text-center font-semibold text-slate-800 border border-white/60 hover:shadow-lg transition-all no-underline block';
+                    
+                    // انتخاب کلاس SPI
+                    let spiClass = 'spi-good';
+                    if (p.spi < 0.8) spiClass = 'spi-danger';
+                    else if (p.spi < 1) spiClass = 'spi-warning';
+                    
+                    link.innerHTML = `
+                        <div class="text-sm">${p.name}</div>
+                        <span class="spi-badge ${spiClass}">SPI: ${p.spi.toFixed(2)}</span>
+                        <div class="text-xs text-slate-500 mt-1">${p.progress}% پیشرفت</div>
+                    `;
+                    
+                    container.appendChild(link);
+                });
+            }
+
+            // =========================================
+            // مدیریت (رمز ورود)
+            // =========================================
+            const modal = document.getElementById('pwModal');
+            const pwInput = document.getElementById('pwInput');
+            const pwError = document.getElementById('pwError');
+
+            document.getElementById('adminBtn').addEventListener('click', function() {
+                if (!isAdmin) {
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+                    pwInput.value = '';
+                    pwError.classList.add('hidden');
+                    pwInput.focus();
+                } else {
+                    exitAdmin();
+                }
             });
-        });
-    }
 
-    renderChart();
-    renderTable();
+            document.getElementById('pwCancel').addEventListener('click', function() {
+                modal.classList.add('hidden');
+                modal.style.display = '';
+            });
 
-    // Admin
-    const modal = document.getElementById('pwModal');
-    const pwInput = document.getElementById('pwInput');
-    const pwError = document.getElementById('pwError');
+            document.getElementById('pwSubmit').addEventListener('click', tryLogin);
+            pwInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') tryLogin();
+            });
 
-    document.getElementById('adminBtn').addEventListener('click',()=>{
-        if(!isAdmin){
-            modal.classList.remove('hidden');
-            modal.style.display='flex';
-            pwInput.value='';
-            pwError.classList.add('hidden');
-            pwInput.focus();
-        } else { exitAdmin(); }
-    });
-    document.getElementById('pwCancel').addEventListener('click',()=>{ modal.classList.add('hidden'); modal.style.display=''; });
-    document.getElementById('pwSubmit').addEventListener('click', tryLogin);
-    pwInput.addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+            function tryLogin() {
+                if (pwInput.value === PASSWORD) {
+                    modal.classList.add('hidden');
+                    modal.style.display = '';
+                    enterAdmin();
+                } else {
+                    pwError.classList.remove('hidden');
+                }
+            }
 
-    function tryLogin(){
-        if(pwInput.value===PASSWORD){ modal.classList.add('hidden'); modal.style.display=''; enterAdmin(); }
-        else { pwError.classList.remove('hidden'); }
-    }
-    function enterAdmin(){
-        isAdmin=true;
-        document.getElementById('adminBar').classList.remove('hidden');
-        document.getElementById('adminBtnLabel').textContent='🔓 خروج';
-        renderEditTable();
-    }
-    function exitAdmin(){
-        isAdmin=false;
-        document.getElementById('adminBar').classList.add('hidden');
-        document.getElementById('adminBtnLabel').textContent='🔒 مدیریت';
-        renderTable();
-    }
-    document.getElementById('adminExit').addEventListener('click', exitAdmin);
+            function enterAdmin() {
+                isAdmin = true;
+                document.getElementById('adminBar').classList.remove('hidden');
+                document.getElementById('adminBtnLabel').textContent = '🔓 خروج';
+                renderEditTable();
+            }
 
-    lucide.createIcons();
-})();
-</script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a17d6b79711316db',t:'MTc4MzQ5NjIwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+            function exitAdmin() {
+                isAdmin = false;
+                document.getElementById('adminBar').classList.add('hidden');
+                document.getElementById('adminBtnLabel').textContent = '🔒 مدیریت';
+                renderTable();
+            }
+
+            document.getElementById('adminExit').addEventListener('click', exitAdmin);
+
+            // =========================================
+            // بارگذاری اولیه
+            // =========================================
+            renderChart();
+            renderTable();
+            renderProjectLinks();
+            lucide.createIcons();
+
+            // =========================================
+            // دابل کلیک روی بازدید برای ریست (اختیاری)
+            // =========================================
+            console.log('📊 داشبورد مدیریت پروژه‌ها - نسخه ۲.۰');
+            console.log('🔑 رمز مدیریت: 1405');
+            console.log('📌 داده‌ها در localStorage ذخیره می‌شوند');
+        })();
+    </script>
+</body>
 </html>
