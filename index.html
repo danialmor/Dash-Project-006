@@ -749,7 +749,7 @@
                     }
 
                     let statusText = '✅ عالی';
-                    if (p.spi < 0.8) statusText = '🔴 بحرانی';
+                    if (p.spi < 0.5) statusText = '🔴 بحرانی';
                     else if (p.spi < 1) statusText = '⚠️ نیازمند توجه';
 
                     const tr = document.createElement('tr');
